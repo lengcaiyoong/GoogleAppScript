@@ -1,0 +1,33 @@
+function str2For() {
+  
+var ss = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet(); 
+
+// item in third row has extra double quote, that's why return error
+var dataset = [ [ 'Ali = askdjf'], ['="Ali\' = \naskdjf"' ], ['="Ali\' = \naskdjf""' ] ]
+ss.getRange("A1:A3").setValues(dataset);
+
+
+//get single value from cell A1
+  let str = ss.getRange("A1").getValue();
+
+  
+//// Set Converted Values at cell A2 or A3
+//// Once convert to formula, it makes no diff if is setValue or setFormula
+  //ss.getRange("A2").setValue(str.padStart(str.length+2,"=\"").concat("\""));
+  //ss.getRange("A3").setFormula(str.padStart(str.length+2,"=\"").concat("\""));
+
+
+////use regex to test if the first or end is double quote
+    // var fir = /^"/ig;
+    // var en=/"$/ig;
+    // let str2 = ss.getRange("A2").getFormula();
+///// Compare str(getValues) vs str2 (formula)
+      //console.log((str));
+      //console.log(fir.test(str));
+      //console.log(en.test(str));
+      // console.log((str2));
+      //console.log(fir.test(str2));
+      //console.log(en.test(str2));
+
+
+}
