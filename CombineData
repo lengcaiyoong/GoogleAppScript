@@ -1,0 +1,25 @@
+function comData() {
+
+/** Combine 2 array datasets
+ * 2 array datasets have same row and col
+ * but store in diff Variables
+ *  
+ */
+
+var ss = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet(); 
+
+// Assume 2 dataset store in 2 variables
+// Col A to C are values, Col D to G are formulas
+  let dataset = ss.getRange("A1:C8").getValues();
+  let datasetb = ss.getRange("D1:G8").getFormulas();
+
+
+// Run forloop to combine dataset
+for (var i=0; i < dataset.length ; i++){
+      dataset[i].push(...datasetb[i]);
+};
+
+console.log(dataset);
+
+
+}
