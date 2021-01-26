@@ -1,0 +1,92 @@
+function dataSet() {
+  
+var ss = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet(); 
+
+
+// Data (Next time better store in "Object, easy to Retrieve Column!")
+let dataset = 	[ [ 'Name', 'ID', 'Notes', '', '', '', '' ],
+  [ 'Jeg',
+    0.4521632925234538,
+    'I like 蘋 果',
+    '=B2+E2',
+    '=B2*3',
+    '=B2+3',
+    '=ArrayFormula(D2:D8*8)' ],
+  [ 'Yeger',
+    0.6716922917200261,
+    'Orange is the best',
+    '=B3+E3',
+    '=B3*3',
+    '=B3+3',
+    '' ],
+  [ 'Gerrad',
+    0.23927559962747202,
+    '蘋果 juice',
+    '=B4+E4',
+    '=B4*3',
+    '=B4+3',
+    '' ],
+  [ 'Times',
+    0.24372434340378202,
+    'Orange cake',
+    '=B5+E5',
+    '=B5*3',
+    '=B5+3',
+    '' ],
+  [ 'Jane',
+    0.008569763165838795,
+    'Salmon Fish',
+    '=B6+E6',
+    '=B6*3',
+    '=B6+3',
+    '' ],
+  [ 'Cooler',
+    0.3829124300227743,
+    'Salmon Orange',
+    '=B7+E7',
+    '=B7*3',
+    '=B7+3',
+    '' ],
+  [ 'Aegfad',
+    0.15937658769094143,
+    'asljfasfjasf',
+    '=B8+E8',
+    '=B8*3',
+    '=B8+3',
+    '' ] ]
+
+
+
+/** Write dataSet with Formulas and Values
+ *  use regex to detect if it is formula
+ *  then use for loop to setValues
+ *  Since Data are in row-Format, therefore use map function to retreive each col
+ */
+
+
+
+//set Header
+ss.getRange(1,1,1,dataset[0].length).setValues([dataset[0]]);
+
+//Run For Loop
+for(var i = 0 ;i < dataset[1].length;i++){
+  let str    = dataset[1][i] ;
+  let regstr = /^=/ig;
+
+//check if the 1st Element is Formula
+ if(regstr.test(str)) {
+
+//if yes, set Formulas 
+        ss.getRange(1,i+1,dataset.length,1).setFormulas(dataset.map(data => [data[i]]));
+
+   }else{
+
+//if not, set Values
+
+        ss.getRange(1,i+1,dataset.length,1).setValues(dataset.map(data => [data[i]]));
+   }
+};
+
+
+
+}
