@@ -1,0 +1,109 @@
+function setValFor() {
+  
+var ss = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet(); 
+
+
+// Data (Next time better store in "Object, easy to Retrieve Column!")
+// Write data on sheets
+let dataset = 	[ [ 'Name', 'ID', 'Notes', '', '', '', '' ],
+  [ 'Jeg',
+    0.4521632925234538,
+    'I like 蘋 果',
+    '=B2+E2',
+    '=B2*3',
+    '=B2+3',
+    '=ArrayFormula(D2:D8*8)' ],
+  [ 'Yeger',
+    0.6716922917200261,
+    'Orange is the best',
+    '=B3+E3',
+    '=B3*3',
+    '=B3+3',
+    '' ],
+  [ 'Gerrad',
+    0.23927559962747202,
+    '蘋果 juice',
+    '=B4+E4',
+    '=B4*3',
+    '=B4+3',
+    '' ],
+  [ 'Times',
+    0.24372434340378202,
+    'Orange cake',
+    '=B5+E5',
+    '=B5*3',
+    '=B5+3',
+    '' ],
+  [ 'Jane',
+    0.008569763165838795,
+    'Salmon Fish',
+    '=B6+E6',
+    '=B6*3',
+    '=B6+3',
+    '' ],
+  [ 'Cooler',
+    0.3829124300227743,
+    'Salmon Orange',
+    '=B7+E7',
+    '=B7*3',
+    '=B7+3',
+    '' ],
+  [ 'Aegfad',
+    0.15937658769094143,
+    'asljfasfjasf',
+    '=B8+E8',
+    '=B8*3',
+    '=B8+3',
+    '' ] ]
+ss.getRange(1,1,1,dataset[0].length).setValues([dataset[0]]);
+for(var i = 0 ;i < dataset[1].length;i++){
+  let str    = dataset[1][i] ;
+  let regstr = /^=/ig;
+ if(regstr.test(str)) {
+        ss.getRange(1,i+1,dataset.length,1).setFormulas(dataset.map(data => [data[i]]));
+   }else{
+        ss.getRange(1,i+1,dataset.length,1).setValues(dataset.map(data => [data[i]]));
+   }
+};
+
+
+
+
+////Formulas
+
+  ////get absolute Formulas and values 
+      // var for_uneven_data = ss.getRange("D2:E8").getFormulas();
+      // var val_uneven_data = ss.getRange("D2:E8").getValues();
+      
+      // console.log(for_uneven_data);
+      // console.log(val_uneven_data);
+          
+      // ss.getRange("I2:J8").setFormulas(for_uneven_data);
+      // ss.getRange("K2:L8").setValues(val_uneven_data);
+          ////if getvalues but setFormulas, it will return an "equal sign"
+      // ss.getRange("K2:L8").setFormulas(val_uneven_data);
+
+
+
+
+    //// Get dynamic reference formula
+    //   var forR1C1_uneven_data = ss.getRange("E2:E8").getFormulasR1C1();
+    //       //Use Map method retrieve dataset 2nd col
+    //         ss.getRange("B10:B17").setValues(dataset.map(data => [data[1]]))
+    //   ss.getRange("E11:E17").setFormulasR1C1(forR1C1_uneven_data);
+    //   console.log(forR1C1_uneven_data);
+
+      
+
+
+    //// Get array formula
+    //   var forArr_uneven_data = ss.getRange("G2:G8").getFormulas();
+            //// Use Map method retrieve dataset 4th col
+    //         ss.getRange("D10:D17").setValues(dataset.map(data => [data[4]]))
+    //   ss.getRange("G11:G17").setFormulas(forArr_uneven_data);
+    //   console.log(forArr_uneven_data);
+
+
+
+
+}
