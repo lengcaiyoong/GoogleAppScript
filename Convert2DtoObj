@@ -1,0 +1,79 @@
+function template() {
+  
+
+
+/**
+ *  Explain array -> obj template
+ *  Array must be [ [keys], [values]] format!
+ */
+
+
+var array = [  
+    ['country', 'population'],
+    ['someplace', 100],
+    ['otherplace', 200]
+];
+
+//get header
+var keys = array.shift();
+// console.log(keys);
+// console.log(array);
+
+
+/**
+ * Convert array into object
+ */
+
+// Run each array
+var objects = array.map(function(values) {
+    //Define each item array to respective object properties
+    return keys.reduce(function(o, k, i) {
+        o[k] = values[i];
+        return o;
+    }, {});
+});
+
+// console.log(objects);
+
+
+/**
+ * End
+ */
+
+
+// For same keys, use this fn
+
+function array2Obj(keys, array){
+    return array.map(function(values) {
+      return keys.reduce(function(o, k, i) {
+        o[k] = values[i];
+        return o;
+    }, {});
+})
+};
+
+
+/**
+ * If having diff keys
+ */
+
+var array = [  
+    ['population1', 'population2'],
+    [ 100],
+    [ 200]
+];
+
+// Gonna use this function
+
+function array2ObjB(keys, array){    
+    return array.reduce(function(o, k, i) {
+        o[keys[i]] = array[i];
+        return o;
+    }, {});
+};
+
+
+
+}
+
+
