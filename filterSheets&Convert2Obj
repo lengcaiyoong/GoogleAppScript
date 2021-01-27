@@ -74,7 +74,7 @@ for (sheet of interestedSheets_name){
     // console.log(interestedSheets_name);
   
 
-let finalOBJ = array2Obj(keys_interestedSheets_name,interestedSheets_name);
+let finalOBJ = array2ObjB(keys_interestedSheets_name,interestedSheets_name);
 
 function array2ObjB(keys, array){    
     return array.reduce(function(o, k, i) {
@@ -91,6 +91,8 @@ function delColto2Darray(dataset, del_from_ncol, end_ncol){
 };
 
 console.log(finalOBJ);
+
+console.log(finalOBJ.dup.getSheetName());
 
 
 
