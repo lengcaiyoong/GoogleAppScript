@@ -1,4 +1,4 @@
-function filterSheets() {
+function modifySheets() {
   
 
 let ss = SpreadsheetApp.getActiveSpreadsheet(); 
@@ -76,6 +76,12 @@ for (sheet of interestedSheets_name){
 
 let finalOBJ = array2ObjB(keys_interestedSheets_name,interestedSheets_name);
 
+
+console.log(finalOBJ);
+console.log(finalOBJ.dup.getSheetName());
+
+
+
 function array2ObjB(keys, array){    
     return array.reduce(function(o, k, i) {
         o[keys[i]] = array[i][0];
@@ -89,11 +95,6 @@ function delColto2Darray(dataset, del_from_ncol, end_ncol){
    dataset.forEach( colToRep=>  colToRep.splice(del_from_ncol,end_ncol) 
   );
 };
-
-console.log(finalOBJ);
-
-console.log(finalOBJ.dup.getSheetName());
-
 
 
 }
