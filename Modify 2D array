@@ -1,0 +1,47 @@
+function modify2DArray() {
+  
+
+var ss = SpreadsheetApp.getActiveSpreadsheet(); 
+
+let dataset = 	[
+   [ 'Name', 'ID', 'Notes', 'Apple' ],
+   [ 'Name2', 'ID2', 'Notes2', 'Apple2' ],
+   [ 'Name3', 'ID3', 'Notes3', 'Apple3' ]
+]
+
+
+let newarr = [1,2,3];
+
+// repColto2Darray(dataset,newarr,2);
+// console.log(dataset);
+
+
+addColto2Darray(dataset,newarr,0);
+console.log(dataset);
+
+
+
+
+/** Modify 2D array column item
+ *  if you have a "newarr" wanna add / replace 2D array col item
+ *  use splice method to insert/delete the particular column item
+ *  ncol is the number of col item you wish to modify in certain row
+ */
+function repColto2Darray(dataset, newarr, ncol_item){
+  dataset.forEach( (colToRep,i) => { colToRep.splice(ncol_item,1,newarr[i]) 
+  });
+};
+
+function addColto2Darray(dataset, newarr, ncol_item,){
+  dataset.forEach( (colToRep,i) => { colToRep.splice(ncol_item,0,newarr[i]) 
+  });
+};
+
+
+
+
+
+
+}
+
+
