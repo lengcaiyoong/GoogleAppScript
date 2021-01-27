@@ -13,11 +13,11 @@ let dataset = 	[
   // let newarr = [1,2,3];
 
 //new arr for row
-  let newarr = [1,2,3,4];
+  // let newarr = [1,2,3,4];
 
 //to add row at the beginning
-  dataset.splice(0,0,newarr);
-  console.log(dataset)
+  // dataset.splice(0,0,newarr);
+  // console.log(dataset)
 
 //replace dataset row 2
   // dataset[2] = newarr;
@@ -25,12 +25,18 @@ let dataset = 	[
 
 
 //// replace column item
-// repColto2Darray(dataset,newarr,2);
-// console.log(dataset);
+  // repColto2Darray(dataset,newarr,2);
+  // console.log(dataset);
 
 //// add new item into specific column
-// addColto2Darray(dataset,newarr,0);
-// console.log(dataset);
+  // addColto2Darray(dataset,newarr,0);
+  // console.log(dataset);
+
+
+
+//delete col 3 and col 4
+  //delColto2Darray(dataset, 2,3);
+  //console.log(dataset);
 
 
 
@@ -51,11 +57,9 @@ function addColto2Darray(dataset, newarr, ncol_item,){
 };
 
 
-
-
-
-
+function delColto2Darray(dataset, del_from_ncol, end_ncol){
+   dataset.forEach( colToRep=> { colToRep.splice(del_from_ncol,end_ncol) 
+  });
+};
 
 }
-
-
