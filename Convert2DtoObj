@@ -67,10 +67,11 @@ var array = [
 
 function array2ObjB(keys, array){    
     return array.reduce(function(o, k, i) {
-        o[keys[i]] = array[i];
+        o[keys[i]] = array[i][0];
         return o;
     }, {});
 };
+
 
 
 
