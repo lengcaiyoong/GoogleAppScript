@@ -1,0 +1,38 @@
+/**
+ * Transform Intersted Sheets to Obj
+ */
+
+function transformSheet2Obj(excludedSheets){
+// only parameter is sheets name which wanna filter
+// if no sheets wanna filter, just leave blank
+
+// Get all sheets
+const sss = SpreadsheetApp.getActiveSpreadsheet(); 
+const allSheetsss = sss.getSheets();
+
+//filter Sheet using Sheet name
+    let interestedSheets_name = [];
+    interestedSheets_name =  Object.entries(allSheetsss).filter( sheet => 
+        !excludedSheets.includes(sheet[1].getSheetName())
+                  );
+// get keys
+let keys_interestedSheets_name = []
+for (sheet of interestedSheets_name){
+  keys_interestedSheets_name.push(sheet[1].getSheetName());
+        };
+//delete unneccesary index col item
+    delColto2Darray(interestedSheets_name,0,1);
+    // console.log(interestedSheets_name);
+let finalOBJ = array2ObjB(keys_interestedSheets_name,interestedSheets_name);
+function array2ObjB(keys, array){    
+    return array.reduce(function(o, k, i) {
+        o[keys[i]] = array[i][0];
+        return o;
+    }, {});
+};
+function delColto2Darray(dataset, del_from_ncol, end_ncol){
+   dataset.forEach( colToRep=>  colToRep.splice(del_from_ncol,end_ncol) 
+  );
+};
+return finalOBJ;
+};
