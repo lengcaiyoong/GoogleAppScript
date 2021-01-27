@@ -9,13 +9,18 @@ let dataset = 	[
    [ 'Name3', 'ID3', 'Notes3', 'Apple3' ]
 ]
 
+//newarr for col
+  // let newarr = [1,2,3];
 
-let newarr = [1,2,3];
+//new arr for row
+  let newarr = [1,2,3,4];
 
+
+//// replace column item
 // repColto2Darray(dataset,newarr,2);
 // console.log(dataset);
 
-
+//// add new item into specific column
 addColto2Darray(dataset,newarr,0);
 console.log(dataset);
 
@@ -36,9 +41,6 @@ function addColto2Darray(dataset, newarr, ncol_item,){
   dataset.forEach( (colToRep,i) => { colToRep.splice(ncol_item,0,newarr[i]) 
   });
 };
-
-
-
 
 
 
