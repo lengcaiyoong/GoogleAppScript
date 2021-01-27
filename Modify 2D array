@@ -15,14 +15,22 @@ let dataset = 	[
 //new arr for row
   let newarr = [1,2,3,4];
 
+//to add row
+  dataset[3] = newarr;
+  console.log(dataset)
+
+//replace dataset row 2
+  dataset[2] = newarr;
+  console.log(dataset);
+
 
 //// replace column item
 // repColto2Darray(dataset,newarr,2);
 // console.log(dataset);
 
 //// add new item into specific column
-addColto2Darray(dataset,newarr,0);
-console.log(dataset);
+// addColto2Darray(dataset,newarr,0);
+// console.log(dataset);
 
 
 
@@ -41,7 +49,6 @@ function addColto2Darray(dataset, newarr, ncol_item,){
   dataset.forEach( (colToRep,i) => { colToRep.splice(ncol_item,0,newarr[i]) 
   });
 };
-
 
 
 }
