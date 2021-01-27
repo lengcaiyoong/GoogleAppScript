@@ -1,0 +1,97 @@
+function filterSheets() {
+  
+
+let ss = SpreadsheetApp.getActiveSpreadsheet(); 
+
+let allSheets = ss.getSheets();
+
+/**
+ * loop all sheets name
+ * Once convert allSheets to array, it has 2 items for each sheet
+ * First item is index in number type, 2nd is the whole sheet in object type
+ */
+    // for (sheet of Object.entries(allSheets)){
+    //   console.log(sheet);
+    //   // console.log(sheet[0]);
+    //   // console.log(sheet[1].getSheetName());     
+    //    };
+
+
+
+/**
+ * therefore, we can use method, such as filter
+ * to deal with each sheet with name / index
+ */ 
+
+
+//define excluded Sheets
+    let excludedSheets = ["Sheet2", "Sheet3"];
+    let excludedSheets_index = [13,14];
+
+
+//filter Sheet using Sheet name
+//includes method doesn't work for numbers
+    let interestedSheets_name = [];
+    interestedSheets_name =  Object.entries(allSheets).filter( sheet => 
+        !excludedSheets.includes(sheet[1].getSheetName())
+                  );
+
+
+//// filter Sheet using Sheet index
+  let interestedSheets_index = [];
+  interestedSheets_index =  Object.entries(allSheets).filter( sheet => 
+    sheet[0] < 13
+                  );
+
+
+////show result
+
+// for (sheet of interestedSheets_name){
+//         // console.log(sheet);
+//         // console.log(sheet[0]);
+//         console.log(sheet[1].getSheetName());     
+//         };
+
+
+// for (sheet of interestedSheets_index){
+//       console.log(sheet[0]);
+      //// console.log(sheet);
+      //// console.log(sheet[1].getSheetName());     
+      //  };
+
+
+
+// convert array to obj
+
+// get keys
+let keys_interestedSheets_name = []
+for (sheet of interestedSheets_name){
+  keys_interestedSheets_name.push(sheet[1].getSheetName());
+        };
+
+//delete unneccesary index col item
+    delColto2Darray(interestedSheets_name,0,1);
+    // console.log(interestedSheets_name);
+  
+
+let finalOBJ = array2Obj(keys_interestedSheets_name,interestedSheets_name);
+
+function array2ObjB(keys, array){    
+    return array.reduce(function(o, k, i) {
+        o[keys[i]] = array[i][0];
+        return o;
+    }, {});
+};
+
+
+
+function delColto2Darray(dataset, del_from_ncol, end_ncol){
+   dataset.forEach( colToRep=>  colToRep.splice(del_from_ncol,end_ncol) 
+  );
+};
+
+console.log(finalOBJ);
+
+
+
+}
