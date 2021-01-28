@@ -1,0 +1,13 @@
+/**
+ * Fill out Missing Data
+ * by default it will fill empty string
+ */
+
+
+function fillOutArray(array, fillItem = ""){
+    return array.map(function(row){
+          let dif = (array.reduce((acc, cur) =>  Math.max(acc, cur.length), 0)) - row.length;
+          row.push(...(fillItem+" ").repeat(dif).split(" ",dif));
+          return row;});
+  };
+
