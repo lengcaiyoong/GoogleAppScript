@@ -1,11 +1,13 @@
 
 /** Get Certain Col. by header
  *  must define "excludedCOLitem" in array format
+ *  if wanna get one header by name, just delete the ! infront excludedCOLitem
  */
 
 
 function getColbyHeader (arr,excludedCOLitem = [] ){
 let arr2 = arr[0].reduce( (acc,item,i) =>  
+//delete "!" if just need specific column
  {if(!excludedCOLitem.some( e => e == item)) {
       return  ((acc, arr ,i) => { 
           acc.push(arr.map( (el) => el[i]));
