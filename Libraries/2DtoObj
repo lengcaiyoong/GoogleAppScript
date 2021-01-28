@@ -1,0 +1,32 @@
+/**
+ * Transform Intersted Sheets to Obj
+ * filter sheets by name
+ */
+
+function sheets2Obj_name(excludedSheets = []){
+// Get all sheets
+let sss = SpreadsheetApp.getActiveSpreadsheet(); 
+let allSheetsss = sss.getSheets();
+allSheetsss = Object.entries(allSheetsss).filter( sheet =>  !excludedSheets.some( e => e == sheet[1].getSheetName()));
+        
+return allSheetsss.reduce(function(o, k, i) {
+        o[allSheetsss[i][1].getSheetName()] = allSheetsss[i][1];
+        return o;
+    }, {});
+};
+
+
+
+function sheets2Obj_index(fn = (i => typeof i == 'string')){
+// Get all sheets
+let sss = SpreadsheetApp.getActiveSpreadsheet(); 
+let allSheetsss = sss.getSheets();
+allSheetsss = Object.entries(allSheetsss).filter( sheet =>  fn(sheet[0]));
+        
+return allSheetsss.reduce(function(o, k, i) {
+        o[allSheetsss[i][1].getSheetName()] = allSheetsss[i][1];
+        return o;
+    }, {});
+};
+
+
