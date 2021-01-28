@@ -1,0 +1,48 @@
+
+/** Get Certain Col. by header
+ *  must define "excludedCOLitem" in array format
+ */
+
+
+function getColbyHeader (arr,excludedCOLitem = [] ){
+let arr2 = arr[0].reduce( (acc,item,i) =>  
+ {if(item !== excludedCOLitem) {
+      return  ((acc, arr ,i) => { 
+          acc.push(arr.map( (el) => el[i]));
+          return acc;
+           })(acc, arr ,i);
+ }else{
+   return acc ;
+ }} ,[])
+ return (function (a){  return Object.keys(arr2[0]).map(function (c) { return arr2.map(function (r) { return r[c]; }); });})(arr2);
+ ;}
+
+
+// End
+
+
+
+/** Get Certain Col. by index
+ *  define callback function of "i"
+ */
+
+function getColbyindex (arr,fn = (i => typeof i == 'number' ) ){
+//specify your f(i) eg. i => i == 0 || i == 1
+     let arr2  =  arr[0].reduce( (acc,item,i) =>  
+               {if( fn(i) ) {
+            return  ((acc, arr ,i) => { 
+              acc.push(arr.map( (el) => el[i]));
+              return acc;
+              })(acc, arr ,i);
+    }else{
+      return acc ;
+    }},[]);
+
+return (function (a){  return Object.keys(arr2[0]).map(function (c) { return arr2.map(function (r) { return r[c]; }); });})(arr2);
+
+    }
+
+
+
+// End
+
