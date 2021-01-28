@@ -1,4 +1,4 @@
-function getCol() {
+function getCertainCol() {
 
 let ss = SpreadsheetApp.getActiveSpreadsheet(); 
 
@@ -22,14 +22,16 @@ let arr = [
  *  must define "excludedCOLitem" in array format
  */
 
-// let excludedCOLitem = arr[0][1];
-// console.log(getColbyHeader(arr,excludedCOLitem));
+let excludedCOLitem = [arr[0][0],(arr[0][2])];
+console.log(excludedCOLitem);
+console.log(getColbyHeader(arr,excludedCOLitem));
+
 
 
 //// Function of getting certain Col by Header
 // function getColbyHeader (arr,excludedCOLitem ){
 // let arr2 = arr[0].reduce( (acc,item,i) =>  
-//  {if(item !== excludedCOLitem) {
+//  {if( !excludedCOLitem.some( e => e == item) ) {
 //       return  ((acc, arr ,i) => { 
 //           acc.push(arr.map( (el) => el[i]));
 //           return acc;
