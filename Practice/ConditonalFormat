@@ -1,21 +1,56 @@
 function autoConditionalFormat() {
-    // Counts how many sheets there are
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var sheets = ss.getSheets();
-    numSheets = sheets.length;  
 
 
-  //exclude certain sheets (filterfunction + some)
-  //clear formatting
+
+/**
+ * Latest Version of auto CF
+ */
+
+// Use library formula convert Sheets To Object
+    var allsheets = lib.sheets2Obj_index(i=> i==2)
+
+// Apply autoCF function
+    lib.autoCF(allsheets,deleteCF());
 
 
-    // Loop to get name of each tab (sheet)
-    var tabNames = new Array()
-    for (var i=0; i<numSheets; i++) tabNames.push( [ sheets[i].getName() ] )
-        // Loops through each sheet
-        for (var i = 0; i < numSheets; i++) {
-            // Applies some conditional formatting to each sheet
-            SpreadsheetApp.setActiveSheet(ss.getSheetByName(tabNames[i]));
+// Recorded CF Macros
+    function deleteCF() {
+    var spreadsheet = SpreadsheetApp.getActive();
+    spreadsheet.getRange('A1').activate();
+    var conditionalFormatRules = spreadsheet.getActiveSheet().  getConditionalFormatRules();
+  conditionalFormatRules.splice(0, 1);
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+};
+
+
+
+
+// END here
+
+
+
+/**
+ * Previous Version of auto CF
+ */
+
+
+  //   // Counts how many sheets there are
+  //   var ss = SpreadsheetApp.getActiveSpreadsheet();
+  //   var sheets = ss.getSheets();
+  //   numSheets = sheets.length;  
+
+
+  // //exclude certain sheets (filterfunction + some)
+  // //clear formatting
+
+
+  //   // Loop to get name of each tab (sheet)
+  //   var tabNames = new Array()
+  //   for (var i=0; i<numSheets; i++) tabNames.push( [ sheets[i].getName() ] )
+  //       // Loops through each sheet
+  //       for (var i = 0; i < numSheets; i++) {
+  //           // Applies some conditional formatting to each sheet
+  //           SpreadsheetApp.setActiveSheet(ss.getSheetByName(tabNames[i]));
 
   /**
    * Insert what your macro recorded here:
@@ -55,6 +90,8 @@ function autoConditionalFormat() {
   // spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
 
 
+
+
 /**
    * End Here
    */
@@ -62,6 +99,8 @@ function autoConditionalFormat() {
 
 
 
-                                                  }
+//                                                   }
+
+
 };
 
