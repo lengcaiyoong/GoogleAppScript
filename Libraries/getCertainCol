@@ -6,7 +6,7 @@
 
 function getColbyHeader (arr,excludedCOLitem = [] ){
 let arr2 = arr[0].reduce( (acc,item,i) =>  
- {if(item !== excludedCOLitem) {
+ {if(!excludedCOLitem.some( e => e == item)) {
       return  ((acc, arr ,i) => { 
           acc.push(arr.map( (el) => el[i]));
           return acc;
