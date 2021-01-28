@@ -1,0 +1,16 @@
+/**
+ * Auto Conditional Format interested Tabs
+ * Please turn Sheets into Obj before use this formula
+ * fn is the recorded macro for CF
+ */
+
+function autoCF(sheetOBJ,fn = i => console.log("input only function name")){
+
+for ( keys in sheetOBJ){
+    SpreadsheetApp.setActiveSheet(sheetOBJ[keys]);
+    fn();
+   };
+
+
+
+}
