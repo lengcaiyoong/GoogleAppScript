@@ -29,7 +29,7 @@ function dailytrackerEmail() {
   
 
 //Reminder
-      let doubleconfirm = ui.alert("Have you update the Month and Year?", ui.ButtonSet.YES_NO);
+      let doubleconfirm = ui.alert("Have you allow access and update the Namelist, Month and Year?", ui.ButtonSet.YES_NO);
 
       if(doubleconfirm == ui.Button.YES){
         console.log("Start Executing~ Please wait...")
@@ -38,6 +38,28 @@ function dailytrackerEmail() {
         return ui.alert( " :) ");
         }
  
+
+/**
+ * Update Namelist
+ */
+
+  //Get namelist
+  let monthly_namelist = ss.getSheetByName("Parameter").getRange("N1").getDataRegion().getValues();
+
+  //clear namelist content
+  ss.getSheetByName("Parameter").getRange("T:W").clearContent();
+
+  SpreadsheetApp.flush();
+  SpreadsheetApp.flush();
+
+  //write name data
+  ss.getSheetByName("Parameter").getRange(1,20,monthly_namelist.length,monthly_namelist[0].length).setValues(monthly_namelist);
+
+  SpreadsheetApp.flush();
+  SpreadsheetApp.flush();
+
+
+
 /**
  *2. Rename Dashboard
  */
@@ -130,7 +152,48 @@ ss.getSheetByName(sheetNAME).getRange(cellNotation).setFormula(vlookResult);
 // End Here
 
 
+// duplicate summary
+ss.setActiveSheet(ss.getSheetByName("Summary"));
+ss.duplicateActiveSheet();
+SpreadsheetApp.flush();
+ss.getActiveSheet().setName("Summary2");
+SpreadsheetApp.flush();
+ss.setActiveSheet(ss.getSheetByName("Summary"));
+ss.deleteActiveSheet();
+SpreadsheetApp.flush();
+ss.setActiveSheet(ss.getSheetByName("Summary2"));
+ss.getActiveSheet().setName("Summary");
+SpreadsheetApp.flush();
 
+
+
+
+// hide col and sheets
+
+  ss.getSheetByName(dashboard_sheetname).getRange('S:U').activate();
+  ss.getActiveSheet().hideColumns(ss.getActiveRange().getColumn(), ss.getActiveRange().getNumColumns());
+  ss.getSheetByName(dashboard_sheetname).getRange('V:V').activate();
+  ss.getSheetByName(dashboard_sheetname).getRange('M:N').activate();
+  ss.getActiveSheet().hideColumns(ss.getActiveRange().getColumn(), ss.getActiveRange().getNumColumns());
+
+  ss.getSheetByName("Parameter").getDataRange().activate();
+  ss.getActiveSheet().protect().addEditors(['slim17@ext.uber.com', 'jlim33@ext.uber.com', 'cng16@ext.uber.com']);
+
+  
+  ss.getSheetByName(dashboard_sheetname).getDataRange().activate();
+  ss.getActiveSheet().protect().addEditors(['slim17@ext.uber.com', 'jlim33@ext.uber.com', 'cng16@ext.uber.com']);
+
+  ss .getSheetByName("Summary").getDataRange().activate();
+  ss.getActiveSheet().protect().addEditors(['slim17@ext.uber.com', 'jlim33@ext.uber.com', 'cng16@ext.uber.com']);
+
+
+  ss.getSheetByName("Parameter").getRange('A1').activate();
+  ss.getActiveSheet().hideSheet();
+
+  ss.getSheetByName("Daily Template").getRange('A1').activate();
+  ss.getActiveSheet().hideSheet();
+
+  
 
 
 };
