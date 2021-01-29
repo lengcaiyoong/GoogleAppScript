@@ -1,0 +1,143 @@
+function dailyTrackerEmail() {
+  
+  let ss = SpreadsheetApp.getActiveSpreadsheet();
+
+
+/**
+ * 1. Click Event
+ */
+
+// Ask stupid question
+  let ui = SpreadsheetApp.getUi();
+  let inputbox = ui.prompt("谁是世界上最可爱的人...?")
+
+    if(
+        (/HONG KHENG YOONG/ig).test(inputbox.getResponseText()) == false ){ 
+        var newresp =  ui.alert("Go Wash your EyES and FACE the WALL!");
+        }
+    if( newresp == ui.Button.OK){
+      return
+    }else{console.log("Calculating Sheets numbers")};
+
+
+// Check sheets length to identify if used this code before  
+    if(ss.getSheets().length > 15 ){
+        return ui.alert(`Sorry! 
+        You've run Code before! 
+
+        This is Life, bye~ :D`);
+    }
+  
+
+//Reminder
+      let doubleconfirm = ui.alert("Have you update the Month and Year?", ui.ButtonSet.YES_NO);
+
+      if(doubleconfirm == ui.Button.YES){
+        console.log("Start Executing~ Please wait...")
+      }else{
+        console.log("errrr...");
+        return ui.alert( " :) ");
+        }
+ 
+ 
+ /**
+ * 2. Start Executing
+ */
+
+
+  //Rename Dashboard
+  let dashboard_sheetname = ss.getSheetByName("Parameter").getRange("B2").getValue().toUpperCase();
+
+  ss.getSheetByName("dashboard").setName(dashboard_sheetname);
+
+  SpreadsheetApp.flush();
+
+
+
+/**
+ * 3. Duplicate Sheets and change Sheets Name
+ */
+
+//get template sheetsName
+let tsheet = ss.getSheetByName("Daily Template");
+
+
+//// double check sheetname format
+// let sheetName1 = ss.getSheetByName("Parameter").getRange("H1").getDataRegion().getValues();
+// console.log(sheetName1);
+
+
+//make sure columns nearby data region is empty, and 2nd col is text format
+//sort sheetname in descending order
+let sheetName = ss.getSheetByName("Parameter").getRange("H1").getDataRegion().getValues().sort( (a,b) => {
+  var dateA = new Date(a[0]);
+  var dateB = new Date(b[0]);
+  return dateB - dateA;}
+);
+
+//// console.log(sheetName);
+
+
+////for loop duplicate sheets
+for (datename of sheetName){
+ss.setActiveSheet(tsheet);
+ss.duplicateActiveSheet();
+ss.getActiveSheet().setName(datename[1]);
+SpreadsheetApp.flush();
+};
+
+// End here
+
+
+
+/**
+ * 4. set VlookUP Range
+ * 
+ */
+
+// set Range Parameter in Array
+// remember to put "" to mention input is string
+
+let vlook_Range_Array = [
+//vlook_total  
+["$I:$O,2",dashboard_sheetname,"B2"],
+//vlook_open 
+["$I:$O,4",dashboard_sheetname,"C2"],
+// vlook_waiting 
+["$I:$O,5",dashboard_sheetname,"D2"],
+// vlook_escalate 
+["$I:$O,6",dashboard_sheetname,"E2"],
+//vlook_resolved
+["$I:$O,7",dashboard_sheetname,"F2"],
+//vlook_dp
+["$I:$Q,8",dashboard_sheetname,"H2"],
+//vlook_eater
+["$I:$Q,9",dashboard_sheetname,"I2"],
+//vlook_dpSolved 
+["$I:$S,10",dashboard_sheetname,"J2"],
+//vlook_eaterSolved 
+["$I:$S,11",dashboard_sheetname,"K2"]]
+
+
+////Trigger Vlookup Fn
+vlook_Range_Array.forEach( s => dashboard_vlook(...s) )
+
+
+//// Function of Vlookup
+function dashboard_vlook(vlookRange,sheetNAME,cellNotation){
+let vlookStore = sheetName.map( datename => 
+`+vlookup($A2:$A,'${datename[1]}'!${vlookRange},False)`
+);
+let vlookResult = `ArrayFormula(filter( ${vlookStore.join("")} , $A2:A <> ""))`;
+SpreadsheetApp.flush();
+ss.getSheetByName(sheetNAME).getRange(cellNotation).setFormula(vlookResult);
+};
+
+
+// End Here
+
+
+
+
+
+};
