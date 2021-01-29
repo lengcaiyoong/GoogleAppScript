@@ -1,0 +1,35 @@
+function updateName() {
+  
+  let ss = SpreadsheetApp.getActiveSpreadsheet();
+  let ui = SpreadsheetApp.getUi();
+  
+  
+  let alertBox = ui.alert("Are you sure you update NAMELIST of this Tracker?",ui.ButtonSet.OK_CANCEL);
+
+  if(alertBox == ui.Button.CANCEL || alertBox == ui.Button.CLOSE){
+      return
+  };
+
+      console.log("Processing namelist...")
+
+
+  let monthly_namelist = ss.getSheetByName("Parameter").getRange("N1").getDataRegion().getValues();
+
+  // console.log(monthly_namelist);
+
+  //clear namelist content
+  ss.getSheetByName("Parameter").getRange("T:W").clearContent();
+
+  SpreadsheetApp.flush();
+  SpreadsheetApp.flush();
+
+  //write name data
+  ss.getSheetByName("Parameter").getRange(1,20,monthly_namelist.length,monthly_namelist[0].length).setValues(monthly_namelist);
+
+  SpreadsheetApp.flush();
+  SpreadsheetApp.flush();
+  
+  ui.alert("DONE");
+
+
+}
