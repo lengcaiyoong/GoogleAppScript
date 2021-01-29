@@ -1,23 +1,22 @@
-function dailyTrackerEmail() {
+function dailytrackerEmail() {
   
   let ss = SpreadsheetApp.getActiveSpreadsheet();
 
-
 /**
- * 1. Click Event
+ *1. Click Event
  */
 
 // Ask stupid question
   let ui = SpreadsheetApp.getUi();
   let inputbox = ui.prompt("谁是世界上最可爱的人...?")
 
-    if(
-        (/HONG KHENG YOONG/ig).test(inputbox.getResponseText()) == false ){ 
-        var newresp =  ui.alert("Go Wash your EyES and FACE the WALL!");
-        }
-    if( newresp == ui.Button.OK){
-      return
-    }else{console.log("Calculating Sheets numbers")};
+    if( inputbox.getResponseText() == "" ) {
+          return
+        }else if ((/HONG KHENG YOONG/ig).test(inputbox.getResponseText()) == false ){
+           return  ui.alert("Go Wash your EyES and FACE the WALL!");
+        };
+
+  console.log("Calculating Sheets numbers")
 
 
 // Check sheets length to identify if used this code before  
@@ -39,23 +38,17 @@ function dailyTrackerEmail() {
         return ui.alert( " :) ");
         }
  
- 
- /**
- * 2. Start Executing
+/**
+ *2. Rename Dashboard
  */
 
-
-  //Rename Dashboard
   let dashboard_sheetname = ss.getSheetByName("Parameter").getRange("B2").getValue().toUpperCase();
-
   ss.getSheetByName("dashboard").setName(dashboard_sheetname);
-
   SpreadsheetApp.flush();
 
 
-
 /**
- * 3. Duplicate Sheets and change Sheets Name
+ *3. Duplicate Sheets and change Sheets Name
  */
 
 //get template sheetsName
@@ -91,7 +84,7 @@ SpreadsheetApp.flush();
 
 
 /**
- * 4. set VlookUP Range
+ *4. set VlookUP Range
  * 
  */
 
