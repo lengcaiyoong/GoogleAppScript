@@ -10,21 +10,30 @@ function dupSheets(){
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var ui = SpreadsheetApp.getUi();
 
-
   let inputSheetName = ui.prompt("Please Enter Template Sheet name").getResponseText();
+
+  if (inputSheetName == ""){
+    return 
+  };
+  
   let num_duplicate = ui.prompt("Please Enter Number of Duplicate").getResponseText();
 
-  if (inputSheetName == "" || num_duplicate == ""){
-    return
-  }
+  if ( num_duplicate == ""){
+    return 
+  };
+
+
+  
 
   let tempSheet = ss.getSheetByName(inputSheetName);
   
   for ( i = 1; i<=parseInt(num_duplicate); i++){
-      ss.setActiveSheet(tempSheet)
+      ss.setActiveSheet(tempSheet);
       ss.duplicateActiveSheet();
   };
   
+
+
 })();
 
 
