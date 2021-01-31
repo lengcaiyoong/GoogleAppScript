@@ -1,5 +1,7 @@
 function changeSheetsName() {
   
+  //UI interFace
+  
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var ui = SpreadsheetApp.getUi();
   var allsheets = ss.getSheets();
