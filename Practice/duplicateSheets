@@ -1,6 +1,10 @@
 function dupSheets(){
 
 
+/**
+ * Duplicate certain Sheets
+ */
+
 (function run_dupSheet(){
 
   var ss = SpreadsheetApp.getActiveSpreadsheet();
