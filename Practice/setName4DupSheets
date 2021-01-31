@@ -1,0 +1,98 @@
+function changeSheetsName() {
+  
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ui = SpreadsheetApp.getUi();
+  var allsheets = ss.getSheets();
+
+
+//Reminder
+  let reminder = ui.alert(`Follow Instruction Below:\n
+  a) Put Those Sheets you wanna change TOGETHER
+  b) Place those final Names you wanna change in ONE COLUMN\n
+  Have you done the steps above? :)
+  `, ui.ButtonSet.YES_NO);
+  
+  if(reminder == ui.Button.YES){
+    console.log("Continue Executing...")
+  }else{
+    return
+  };
+
+
+//Get Final Sheets name in column
+  let inputsheetName = ui.prompt("Please Enter the Range of Final Sheets name: \n\n example: A1:A5")
+    //it will breaks automatically if that is not a valid range
+      let sheets_name = ss.getActiveSheet().getRange(inputsheetName.getResponseText()).getValues();
+      console.log("get Final Sheets name");
+  
+//Ask for Starting and End Sheets
+//return nothing if no input / close
+
+let start_sheet_name = ui.prompt("Please Enter the Sheet Name you wish to START from: ");
+if(start_sheet_name.getSelectedButton() == ui.Button.CLOSE ||start_sheet_name.getResponseText() == ""  ){
+  return
+};
+console.log("get start_sheet_name");
+
+let end_sheet_name = ui.prompt("Please Enter the Sheet Name you wish to END with: ");
+if(end_sheet_name.getSelectedButton() == ui.Button.CLOSE ||end_sheet_name.getResponseText() == ""  ){
+  return
+};
+console.log("get end_sheet_name");
+
+// Update Starting and end sheet name
+start_sheet_name = start_sheet_name.getResponseText();
+end_sheet_name = end_sheet_name.getResponseText();
+
+
+/** 
+ * Run Code
+ */
+
+//Get Indexes from Starting and End Sheets
+  let  start_endSheets =  Object.entries(allsheets).filter( s => { 
+    // console.log(s[1].getSheetName());
+    // console.log(s[1].getSheetName() == start_sheet_name);
+    // console.log(s[1].getSheetName() == end_sheet_name);
+    return s[1].getSheetName() == start_sheet_name || s[1].getSheetName() == end_sheet_name; 
+  });
+
+  let getindexes = start_endSheets.map( s => parseInt(s[0]));
+
+// filterSheets From index
+  let  filter_start_endSheets =  Object.entries(allsheets).filter( s => (
+    s[0] >= getindexes[0] && s[0] <= getindexes[1]
+    ) 
+      );
+
+
+// Compare both array lengths
+console.log(`filter sheets length: ${filter_start_endSheets.length} vs Final Sheets length: ${sheets_name.length}
+
+**If filter sheets length is zero, means some sheets entered not found`);
+
+// Error Detection
+if( sheets_name.length !== filter_start_endSheets.length ){
+  ui.alert("Number of Sheets don't match with number of Names given");
+}
+
+if( sheets_name.length !== filter_start_endSheets.length ){
+  return
+}
+
+
+// Setname 
+for ( [sheet,i] of filter_start_endSheets){
+  //sheet is the whole array of index and sheets
+  //i is the sheet
+ ss.setActiveSheet(i);
+ ss.getActiveSheet().setName(sheets_name[(sheet - filter_start_endSheets[0][0])][0]);
+ SpreadsheetApp.flush();
+};
+
+console.log("100% COMPLETED!");
+ui.alert("100% COMPLETED :D ")
+
+}
+
+
