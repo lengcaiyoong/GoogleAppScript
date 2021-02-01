@@ -29,7 +29,7 @@ function dailytrackerEmail() {
   
 
 //Reminder
-      let doubleconfirm = ui.alert("Have you allow access and update the Namelist, Month and Year?", ui.ButtonSet.YES_NO);
+      let doubleconfirm = ui.alert("Have you allowed access and updated the Namelist, Month and Year?", ui.ButtonSet.YES_NO);
 
       if(doubleconfirm == ui.Button.YES){
         console.log("Start Executing~ Please wait...")
@@ -37,6 +37,13 @@ function dailytrackerEmail() {
         console.log("errrr...");
         return ui.alert( " :) ");
         }
+
+
+     let allowNamelist_Access = ss.getSheetByName("Parameter").getRange("C11").getValues();
+
+      if (allowNamelist_Access == "#REF!"){
+        return ui.alert("Please Allow Access in C11 :)");
+      }
  
 
 /**
@@ -98,6 +105,9 @@ for (datename of sheetName){
 ss.setActiveSheet(tsheet);
 ss.duplicateActiveSheet();
 ss.getActiveSheet().setName(datename[1]);
+SpreadsheetApp.flush();
+//set protection
+SpreadsheetApp.getActive().getRange('I:S').protect().addEditors(['slim17@ext.uber.com', 'jlim33@ext.uber.com', 'cng16@ext.uber.com']);
 SpreadsheetApp.flush();
 };
 
@@ -173,10 +183,13 @@ SpreadsheetApp.flush();
   ss.getSheetByName(dashboard_sheetname).getRange('S:U').activate();
   ss.getActiveSheet().hideColumns(ss.getActiveRange().getColumn(), ss.getActiveRange().getNumColumns());
   ss.getSheetByName(dashboard_sheetname).getRange('V:V').activate();
-  ss.getSheetByName(dashboard_sheetname).getRange('M:N').activate();
+  ss.getSheetByName(dashboard_sheetname).getRange('M:M').activate();
   ss.getActiveSheet().hideColumns(ss.getActiveRange().getColumn(), ss.getActiveRange().getNumColumns());
 
   ss.getSheetByName("Parameter").getDataRange().activate();
+  ss.getActiveSheet().protect().addEditors(['slim17@ext.uber.com', 'jlim33@ext.uber.com', 'cng16@ext.uber.com']);
+
+  ss.getSheetByName("Daily Template").getDataRange().activate();
   ss.getActiveSheet().protect().addEditors(['slim17@ext.uber.com', 'jlim33@ext.uber.com', 'cng16@ext.uber.com']);
 
   
