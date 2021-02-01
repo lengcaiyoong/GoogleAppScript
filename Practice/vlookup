@@ -1,0 +1,29 @@
+function vLOOKUP() {
+
+/**
+ * Vlookup and update your raw data
+ * Have to input raw_range and vlookup_range
+ */
+
+
+//input Raw Data Range and lookup Table Range
+var raw_range = "A2:B6";
+var vlookup_range = "E2:F4";
+
+
+
+(function vlook(raw_range, vlookup_range){
+var ss = SpreadsheetApp.getActiveSpreadsheet();
+var raw = ss.getActiveSheet().getRange(raw_range).getValues();
+var vdata = ss.getActiveSheet().getRange(vlookup_range).getValues();
+raw.map( (x,i) => 
+{ if(vdata.filter( y => y[0] == x[0] ).length >0){
+    raw[i] = (vdata.filter( y => y[0] == x[0] ))[0]}
+});
+ss.getActiveSheet().getRange(raw_range).setValues(raw);
+})(raw_range, vlookup_range);
+
+
+
+
+}
