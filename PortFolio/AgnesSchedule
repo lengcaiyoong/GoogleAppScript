@@ -1,0 +1,83 @@
+function agnesAL() {
+
+let ss = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+
+
+
+/**
+ * Trigger Issue
+ * https://developers.google.com/apps-script/guides/triggers/events
+ */
+
+// function onEDIT(evt){
+//   var spreadsheet = evt.source.getActiveSheet().getSheetName();//getname without activate Sheet, source is whole spreadsheet
+//   var range = evt.range; //get the edited range with row/col start and end
+//   var ecol = range.getColumn(); 
+//   var erow = range.getRow();
+//   var pValue = evt.oldValue; 
+//   var nValue = evt.value;
+//   console.log([spreadsheet,ecol,erow,pValue,nValue]);
+  
+// };
+
+
+
+ 
+// function  onSUBMIT(evt) {
+//   var spreadsheet = evt.source.getActiveSheet().getSheetName();
+//   var range = evt.range; //the range pasted on spreadsheet
+//   var ecol = range.getLastColumn();
+//   var erow = range.getRow();
+//   var evtval = evt.values; //get the array of outcome
+//   var evtnval = evt.namedValues; //get object of outcome
+
+  // console.log(range);
+  // console.log([spreadsheet,erow,ecol]);
+
+//// Transfer to JSON string
+// SpreadsheetApp.getActiveSpreadsheet().getSheetByName("testing trigger").getRange("B11").setValue(JSON.stringify(evtnval));
+
+//// Get Back JSON data
+// let user = JSON.parse( SpreadsheetApp.getActiveSpreadsheet().//getSheetByName("testing trigger").getRange("B11").getValue());
+//};
+
+
+//End
+
+
+
+
+//// Filter Duplicate in Date Object
+// let dates = ss.getRange("A1:A5").getValues().map( x => x[0]);
+// let dateset = Array.from(new Set(dates));
+// ss.getRange("B1:B4").setValues(dateset.map(x => [new Date(x)]));
+
+////Change Date to String
+//Utilities.formatDate(new Date(d2), "UTC+8", "dd MMM yyyy")
+
+//change date to UTC +8
+// new Date( "date" + "UTC0800");
+
+
+
+// ////Get Random Element From Array
+// var items = ["a",1,3,5];
+// var item = items[Math.floor(Math.random() * items.length)];
+
+
+
+// ////Set Background color
+//   var spreadsheet = SpreadsheetApp.getActive();
+//   spreadsheet.getRange('F24').activate();
+//   spreadsheet.getActiveRangeList().setBackground('#00ffff');
+
+
+
+
+
+
+
+
+
+}
