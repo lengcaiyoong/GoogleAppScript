@@ -1,5 +1,6 @@
 function multipleItemInList() {
 
+
 /**
  * To find if multiple item which is in the list
  * let says, [a,b,c]   vs [1 - 10] item list
@@ -27,6 +28,26 @@ arr2.forEach( i => {
 )
 
 console.log(arr1);
+
+//END
+
+
+
+
+
+/**
+ * Or use Set to remove duplicate
+ * but only can apply on "Array" or "string", Object Data Cannot filter
+ * https://stackoverflow.com/questions/39721276/remove-set-of-values-in-an-existing-set
+ */
+
+
+ let sarr1 = new Set(["a","b","c"]); // Final Result
+ let sarr2 = new Set([1,2,"a",3,4,5,"c"]);
+
+arr2.forEach(Set.prototype.delete, arr1);
+
+console.log([...arr1]);
 
 
 
