@@ -55,8 +55,8 @@ let obbj = [{al:"t" , no:5},
 
 obbj.forEach( i => {
   cond.forEach( (c,ind) =>{
-      if(i.al==c[0] && i.no == c[1]){
-         cond.splice(ind,1);
+      if(i.al==c[0] && i.no == c[1]){  //simply increase the dimension if you have 3 things to compare
+         cond.splice(ind,1); 
           }
                     }
   )
