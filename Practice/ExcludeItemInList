@@ -9,28 +9,65 @@ function multipleItemInList() {
 
 
 
-//c (stands for condition)
-let arr1 = ["a","b","c"];
-//i (stands for item)
-let arr2 = [1,2,"a",3,4,5,"c"];
+// //c (stands for condition)
+// let arr1 = ["a","b","c"];
+// //i (stands for item)
+// let arr2 = [1,2,"a",3,4,5,"c"];
 
-//Double For loop
+// //Double For loop
 
-arr2.forEach( i => {
-  arr1.forEach( c =>{
-    if(i==c){
-        arr1.splice(arr1.indexOf(c),1);
-          }
-                    }
-  )
-    console.log(arr1);
-}
-)
+// arr2.forEach( i => {
+//   arr1.forEach( c =>{
+//     if(i==c){
+//         arr1.splice(arr1.indexOf(c),1);
+//           }
+//                     }
+//   )
+//     console.log(arr1);
+// }
+// )
 
-console.log(arr1);
+// console.log(arr1);
 
 //END
 
+
+
+
+/**
+ * Complicated Example
+ */
+
+//criteria pair [[a,1],[b,2],[c,3]]
+//10 Obj each has 2 value and key (al, no)
+//if same, exclude the criteria pair
+
+
+var cond = [["a",1],["b",2],["c",3]]; 
+let obbj = [{al:"t" , no:5},
+  {al:"b" , no:2},
+  {al:"j" , no:0},
+  {al:"q" , no:4},
+  {al:"s" , no:6}]
+
+
+//Double For loop
+
+obbj.forEach( i => {
+  cond.forEach( (c,ind) =>{
+      if(i.al==c[0] && i.no == c[1]){
+         cond.splice(ind,1);
+          }
+                    }
+  )
+    console.log(cond);
+}
+)
+
+console.log(cond);
+
+
+//END
 
 
 
@@ -42,12 +79,15 @@ console.log(arr1);
  */
 
 
- let sarr1 = new Set(["a","b","c"]); // Final Result
+ let sarr1 = new Set(["a","b","c"]); // Array which you want At the End
  let sarr2 = new Set([1,2,"a",3,4,5,"c"]);
 
-arr2.forEach(Set.prototype.delete, arr1);
 
-console.log([...arr1]);
+//Run sarr2 element, but return sarr1
+sarr2.forEach(Set.prototype.delete, sarr1); 
+
+
+console.log([...sarr1]);
 
 
 
