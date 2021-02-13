@@ -1,0 +1,15 @@
+/**
+ * getHeaderA1 Fn get column index and return A1 notation
+ * notFn convert number to A1 notation
+ */
+
+function getHeaderA1(sheet,header,header_row = "1:1"){
+   return  notFn(  (sheet.getRange(header_row).getValues())[0].indexOf(header));
+};
+notFn = (n) => (a=Math.floor((n)/26)) >= 0 ? notFn(a-1) + String.fromCharCode(65+((n)%26)) : '';
+
+
+    // var ss = SpreadsheetApp.getActiveSheet();
+    // console.log(getHeaderA1( ss,"J"));
+
+
