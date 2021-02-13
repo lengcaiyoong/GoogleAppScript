@@ -1,0 +1,14 @@
+
+/**
+ * Get Last Row with non-empty element
+ */
+
+function nonEmpty_LastRow(sheet, colA1){
+    var colData = sheet.getRange(`${colA1}:${colA1}`).getValues();
+    return 1 + colData.reduce( (acc, cur,idx ) => cur[0] !== '' ? idx:acc,-1)
+
+}
+      // var ss = SpreadsheetApp.getActiveSheet();
+      // console.log(nonEmpty_LastRow(ss,getHeaderA1(ss,"Jackie")));
+
+
