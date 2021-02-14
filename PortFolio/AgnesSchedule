@@ -63,7 +63,7 @@ let ss = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
 
 //change date to UTC +8
-// new Date( "date" + "UTC0800");
+// new Date( "date" + "UTC+0800");
 
 
 //get accurate millisecond
@@ -171,6 +171,7 @@ function nonEmpty_LastRow(sheet, colA1){
 }
 
 
+
 function splitDate() {
 
 
@@ -214,6 +215,7 @@ for ( key in fdobj){
             //getDate + 1 
             //reduce function, create Arrayfrom to loop
             //reference https://stackoverflow.com/questions/4413590/javascript-get-array-of-dates-between-2-dates
+            //https://javascript.info/date
       //return dateString
       //check invalid Date
 
