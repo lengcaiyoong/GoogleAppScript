@@ -46,7 +46,10 @@ let ss = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 //End
 
 
-
+/**
+ * if Local Time is Singapore Time
+ * Spreadsheet will treat it as SIngapore Time, but show new york Time
+ */
 
 //// Filter Duplicate in Date Object
 // let dates = ss.getRange("A1:A5").getValues().map( x => x[0]);
@@ -55,11 +58,16 @@ let ss = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
 ////Change Date to String
 //Utilities.formatDate(new Date(d2), "UTC+8", "dd MMM yyyy")
+////OR
+//new Date( dateobject_fromSpreadsheet.toString()+ "UTC1300")
+
 
 //change date to UTC +8
 // new Date( "date" + "UTC0800");
 
 
+//get accurate millisecond
+// new Date ("date").getTime();
 
 // ////Get Random Element From Array
 // var items = ["a",1,3,5];
@@ -74,8 +82,88 @@ let ss = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
 
 
+// End Here
 
 
+/**
+ * getHeaderA1 Fn get column index and return A1 notation
+ * notFn convert number to A1 notation
+ */
+
+function getHeaderA1(sheet,header,header_row = "1:1"){
+   return  notFn(  (sheet.getRange(header_row).getValues())[0].indexOf(header));
+};
+notFn = (n) => (a=Math.floor((n)/26)) >= 0 ? notFn(a-1) + String.fromCharCode(65+((n)%26)) : '';
+
+
+    // var ss = SpreadsheetApp.getActiveSheet();
+    // console.log(getHeaderA1( ss,"J"));
+
+
+
+/**
+ * Get Last Row with non-empty element
+ */
+
+function nonEmpty_LastRow(sheet, colA1){
+    var colData = sheet.getRange(`${colA1}:${colA1}`).getValues();
+    return 1 + colData.reduce( (acc, cur,idx ) => cur[0] !== '' ? idx:acc,-1)
+
+}
+      // var ss = SpreadsheetApp.getActiveSheet();
+      // console.log(nonEmpty_LastRow(ss,getHeaderA1(ss,"Jackie")));
+
+
+//End Here
+
+
+
+
+
+
+/**
+ * Insert Number in Sorted Array
+ * by using map and sorted fn
+ * header and blank data will be move above during comparison
+ */
+
+// var ss = SpreadsheetApp.getActiveSheet();
+// var ssdata = ss.getDataRange().getValues();
+// var newdata = [2550];
+
+// //push and sort data
+// sortedSSdata = ssdata.map( (x,i) => x.concat([i+1]) ).concat([newdata]).sort( (a,b) => a[0] - b[0]  ); 
+
+// var newdata_position = sortedSSdata.findIndex( x => x.length == 1 );
+// var col_after = sortedSSdata[newdata_position-1][1];
+
+// //find the pasted row
+//  SpreadsheetApp.getActiveSheet().insertRowAfter(col_after);
+// console.log(`paste at row ${col_after + 1}`);
+
+
+
+//Example of Sorting using Time Format (millisec)
+
+// var ss = SpreadsheetApp.getActiveSheet();
+// var ssdata = ss.getRange("A1:A5").getValues();
+// var newdata = [ss.getRange("D2").getValue()];
+    // console.log(ssdata);
+    // console.log(newdata);
+
+//push and sort data (by using getTime Fn)
+//  sortedSSdata = ssdata.map( (x,i) => x.concat([i+1]) ).concat([newdata]).map(x =>  (typeof x[0] == 'object'&& x[0]!=='')? [x[0].getTime(),x[1]]:x   ).sort( (a,b) => a[0] - b[0]  );
+    
+    //console.log(sortedSSdata);
+
+// var newdata_position = sortedSSdata.findIndex( x => x[1] == undefined  );
+    //console.log(newdata_position);
+
+// var col_after = sortedSSdata[newdata_position-1][1];
+
+////find the pasted row
+    // SpreadsheetApp.getActiveSheet().insertRowAfter(col_after);
+    //console.log(`paste at row ${col_after + 1}`);
 
 
 
