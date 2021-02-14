@@ -64,6 +64,7 @@ let ss = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
 //change date to UTC +8
 // new Date( "date" + "UTC+0800");
+// new Date( "date" + "UTC+08:00");
 
 
 //get accurate millisecond
