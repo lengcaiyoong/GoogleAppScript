@@ -59,7 +59,7 @@ let ss = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 ////Change Date to String
 //Utilities.formatDate(new Date(d2), "UTC+8", "dd MMM yyyy")
 ////OR
-//new Date( dateobject_fromSpreadsheet.toString()+ "UTC1300")
+//new Date( dateobject_fromSpreadsheet.toString()+ "UTC+0800")
 
 
 //change date to UTC +8
