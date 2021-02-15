@@ -173,7 +173,6 @@ function nonEmpty_LastRow(sheet, colA1){
 
 
 
-
 function splitDate() {
 
 
@@ -211,14 +210,11 @@ for ( key in fdobj){
 
 // Convert Date Function
     //Need a Fn  convert to Normal Date
-      //delete HF1 and HF2
-      //invalid date
       //range convert
             //replace HF1
-                //re = /([\(（]\s*HF[12]\s*[\)）])\s*/
+               //re = /([\(（]\s*HF[12]\s*[\)）])\s*/
             // new Date("15 Feb 2021 " + "UTC+8" )
             //Utilities.formatDate(new Date(d2), "UTC+8", "dd MMM yyyy")
-      //return dateString
       
 
 var s1 = '28 Jan 2021 ( HF1)'.replace(/([\(（]\s*HF[12]\s*[\)）])\s*/,'');
@@ -234,14 +230,54 @@ function drange(){
     {length: days}, drange, {start: ([s1,s2].sort( (a,b) => new Date(a + 'UTC+8') - new Date(b+ 'UTC+8') )[0])+'UTC+8',factor: 0} 
   );
 
-
 //  console.log(dateRange);  //return date object list
+
 
 
 
 
 //Write in JSON column
 // SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form responses 8").getRange("I39").setValue(JSON.stringify(fdobj));
+
+
+}
+
+
+function invalidDate() {
+
+var date_string = "21 Sep 2021 - 17 Sep 2021 (HF1),  18 Sep 2021 (HF2),  19 Sep 2021 (HF1), 20 Sep 2021".match(/(\d?\d\s+\w{3}\s+\d{4})/ig);
+
+var date_string2 = "13 Sep 2021 - 18 Sep 2021, 30 Sep 2021".match(/(\d?\d\s+\w{3}\s+\d{4})/ig);
+
+// console.log(date_string);
+
+ function vdCheck(d){   //check if date is valid
+    let dy = d.match(/\b(0?[1-9]|[12]\d|30|31)\b/g);
+    let yea = d.match(/\d{4}/g);
+    let test_date = new Date(d );
+    return vdcheck =
+       test_date.getFullYear() == yea &&
+       test_date.getDate() == dy;
+ } 
+
+// console.log(  vdCheck(date_string[0])); //31 Sep and 32 Sep is false
+
+
+//date Crash
+  //Remember to convert to Millisecond or dateString if wanna use Set
+
+
+    (new Set(date_string).size + new Set(date_string2).size) ==  new Set( date_string.concat(date_string2)).size;
+
+
+//NaN date issue
+  // console.log( new Date("1 Feb 2021") );
+
+
+// Duplicate Name and Date
+  //use filter and length
+
+
 
 
 }
