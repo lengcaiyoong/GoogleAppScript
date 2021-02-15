@@ -173,6 +173,7 @@ function nonEmpty_LastRow(sheet, colA1){
 
 
 
+
 function splitDate() {
 
 
@@ -211,16 +212,30 @@ for ( key in fdobj){
 // Convert Date Function
     //Need a Fn  convert to Normal Date
       //delete HF1 and HF2
+      //invalid date
       //range convert
-            //calculate Dates
-            //getDate + 1 
-            //reduce function, create Arrayfrom to loop
-            //reference https://stackoverflow.com/questions/4413590/javascript-get-array-of-dates-between-2-dates
-            //https://javascript.info/date
+            //replace HF1
+                //re = /([\(（]\s*HF[12]\s*[\)）])\s*/
+            // new Date("15 Feb 2021 " + "UTC+8" )
+            //Utilities.formatDate(new Date(d2), "UTC+8", "dd MMM yyyy")
       //return dateString
-      //check invalid Date
+      
+
+var s1 = '28 Jan 2021 ( HF1)'.replace(/([\(（]\s*HF[12]\s*[\)）])\s*/,'');
+var s2 = ' 5 Feb 2021  (HF2)'.replace(/([\(（]\s*HF[12]\s*[\)）])\s*/,'');
+
+//get days
+var days = (Math.abs(new Date( s1 +'UTC+8' ).getTime()-new Date( s2 +'UTC+8' ).getTime()))/8.64e7+1;
+
+function drange(){ 
+  return new Date (  new Date(this.start).setDate(new Date(this.start).getDate()+ (this.factor++)) )
+  }
+ let dateRange = Array.from(
+    {length: days}, drange, {start: ([s1,s2].sort( (a,b) => new Date(a + 'UTC+8') - new Date(b+ 'UTC+8') )[0])+'UTC+8',factor: 0} 
+  );
 
 
+//  console.log(dateRange);  //return date object list
 
 
 
