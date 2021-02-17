@@ -1,0 +1,254 @@
+/**
+ * Date Tool box
+ */
+    //Convert Time To Date Obj   //dObj
+    //Convert Time To Millisecond  //mili  
+    //Replace HF1   //cHF
+    //Convert To range of dates //rdObj
+    //return nonduplicate set  //cdup
+    //get 1 date or 2 dates, ignore HF and hyphenate  //sd
+
+let dtb = {   //date tool box
+    dObj(d){return  new Date( d + "UTC+8")},
+    mili(d){return this.dObj(d).getTime()},
+    cHF(d){return d.replace(/([\(（]\s*HF[12]\s*[\)）])\s*/,'')},
+    gd(dstr){return dstr.match(/(\d?\d\s+\w{3}\s+\d{4})/ig)},
+    rdObj(dstr){
+     if(dtb.gd(dstr).length ==1){
+       return [dtb.dObj(dstr)];
+     }else{ 
+       return Array.from(
+          {length: ((Math.abs(dtb.dObj(dtb.gd(dstr)[0] ).getTime()-dtb.dObj( dtb.gd(dstr)[1]).getTime()))/8.64e7+1)}, 
+          drange, 
+          {start: (dtb.gd(dstr).sort( (a,b) => dtb.dObj(a) - dtb.dObj(b) )[0])+'UTC+8',factor: 0,});}
+                },
+    cdup(ts){return Array.from(new Set(ts))}
+}
+
+
+
+function fd2obj(fd){   //transform array to obj, split dates to 3 group
+let fdobj = headers.reduce( (acc, cur, i) => { acc[cur] = fd[i];return acc} ,{})
+  for ( key in fdobj){ RegExp(dot).test(key)?(fdobj[key] = {
+    Full: ( fdobj[key].split(/[,，]/)).filter( x => !(/HF[12]/.test(x)) ).filter(x => x !=='') ,
+    HF1:  ( fdobj[key].split(/[,，]/)).filter( x => (/HF1/).test(x)  ).filter(x => x !==''),
+    HF2:  ( fdobj[key].split(/[,，]/)).filter( x => (/HF2/).test(x) ).filter(x => x !=='')}):''
+;}
+  return fdobj;
+ }
+
+
+ function vdCheck(d){   //check if date is valid
+    let dy = d.match(/\b(0?[1-9]|[12]\d|30|31)\b/g);
+    let yea = d.match(/\d{4}/g);
+    let test_date = new Date(d );
+    return vdcheck =
+       test_date.getFullYear() == yea &&
+       test_date.getDate() == dy;
+ } 
+
+function drange(){   //date range fn
+  return new Date (  new Date(this.start).setDate(new Date(this.start).getDate()+ (this.factor++)) )
+}
+
+
+
+
+/**
+ * Header index
+ */
+let hIdxS = (hname) =>  headers.indexOf(hname)+1; //Header index for Spreadsheet
+let hIdxArr = (hname) =>  headers.indexOf(hname); //Header index for array
+
+
+/**
+ * Invalid Detection
+ */
+
+//Special remark detection
+  let detSPR = (fdrow) => fd[hIdxArr(rmk)] !== ''?(sheet.getRange(fdrow,hIdxS(tg)).setValue("Special Remark"), ui.alert(`<<ERROR>>:\n\nSpecial Remark at row ${fdrow}`),fail):'';
+
+  //Blank date detection
+  let detblk = (fdrow) => headers.reduce( (acc,cur, ind) => RegExp(dot).test(cur)?acc.concat([fd[ind]]):acc,[]).filter(x => x !=='').length == 0?(ui.alert(`<<ERROR>>\n\n Blank Dates at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg)).setValue("Blank Dates"),fail):'';
+//
+
+//Invalid date detection
+  let detInvD = (fdrow) => headers.map( (h,i) => RegExp(dot).test(h)? (fd[i] == ''?'':
+    fd[i].match(/(\d?\d\s+\w{3}\s+\d{4})/ig)==null?(sheet.getRange(fdrow,hIdxS(tg)).setValue("Invalid Date"),ui.alert(`Invalid date in data at row ${fdrow}`),fail):
+    
+    (  fd[i].match(/(\d?\d\s+\w{3}\s+\d{4})/ig).forEach(  d => 
+      (vdCheck(d) == false)? (ui.alert(`<<ERROR>>\n\nInvalid Date Found at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg)).setValue("Invalid Date"),fail):''
+                                                    ))
+
+    ):''
+  );
+//
+
+
+//Duplicate Submit
+  let detDupSub = (fdrow) => sheet.getRange(2,1,fdrow-2,headers.length).getValues().filter(
+    x => 
+    x[hIdxArr(emel)] == fd[hIdxArr(emel)] && 
+    x[hIdxArr(d1)] == fd[hIdxArr(d1)] && 
+    x[hIdxArr(d2)] == fd[hIdxArr(d2)] 
+  ).length > 0? (ui.alert(`<<ERROR>>\n\n Agent submitted duplicate data before!`),sheet.getRange(fdrow,hIdxS(tg)).setValue("Duplicate Submit"),fail):'';
+//
+
+
+//Date crash Detection
+let detCrash = (fdrow) => headers.map( (h,i) => 
+{if(RegExp(dot).test(h)){
+      var allALTYPE =   Object.entries(fd[h]).reduce( (acc, cur, ind) =>  
+      acc.concat(...cur[1]),[]);
+      allALTYPE.filter(x => x !== '').length == dtb.cdup(  allALTYPE  ).filter(x => x !== '').length?'':
+    (ui.alert(`<<ERROR>>\n\nDate Crash at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg)).setValue("Date Crash"),fail)}});
+//
+
+
+//Subset Test- Flatten
+  //Flatten Objs to 2 Arrays
+    //call each Dot Obj
+    //Create Flat obj in array -> 
+        //Object Entries + reduce loop each ALtype and element and add Al type tag
+        // [].concat([]) will return []
+        // [].filter(String) return []
+  //Either Empty Skip, 
+    //else (smallest or 2nd have all index >0) empty smallest
+let flatd1d2 = () => headers.map( (h,i) => 
+    {if ( RegExp(dot).test(h) ){
+    fd['flat'+h] =  Object.entries(fd[h]).reduce( (acc,cur,i) => 
+          acc.concat(cur[1].map( x => cur[0] + '-' + x   ))
+      ,[]).filter(x => x !== '')};
+    });
+
+
+//Subset Empty Test
+  //loop each keys obj.entries(fd)
+    //if name has "flat" and not empty and acc is empty
+      //put acc
+    //if name is flat and not empty and acc isn't empty
+      //compare with acc
+        // basically acc is 1st. cur is 2nd
+            //if acc < cur, swap acc and cur
+            //set variable swap as true if acc <cur
+        // act upon cur indexOf every >=0
+          //clear flat cur  and Object.entries(fd[replace flat to '']).map()
+          //swap flat and fd if required
+
+
+let detSub = () => Object.entries(fd).reduce( (acc,cur,i) => {
+  
+  if( RegExp(flt).test(cur[0]) && cur[1].length >0 && acc.length == 0  ){
+      return acc.concat(cur)
+  
+  }else if( RegExp(flt).test(cur[0]) && cur[1].length >0 && acc.length > 0 ){
+      
+      if( acc[1].length < cur[1].length ){
+        var firstIsEmp = true;
+          [acc,cur] = [cur,acc];}
+
+    console.log(firstIsEmp),
+
+    cur[1].map( (x,ind) => acc[1].indexOf(x) ).every( j => j>=0 )? 
+     ( fd[cur[0]] = [],
+      
+      Object.entries(fd[cur[0].replace(flt,'')]).map( (x,i) =>   
+        fd[cur[0].replace(flt,'')][x[0]] = []) ,
+      
+      firstIsEmp? (
+      (function (){ [fd[cur[0]], fd[acc[0]]] = [fd[acc[0]], fd[cur[0]]]})(),
+      (function(){ [fd[cur[0].replace(flt,'')], fd[acc[0].replace(flt,'')  ]] = [fd[acc[0].replace(flt,'')  ], fd[cur[0].replace(flt,'')]]})()
+        ):''
+
+    )
+     :'';
+
+  return acc
+
+  }else{
+    return acc
+  }
+
+  }
+
+  ,[]);
+
+
+
+//Swap DoA if 1st is empty
+
+    //{ [objt3['arr1'], objt3['arr2']] = [objt3['arr2'], objt3['arr1']]};
+
+
+
+
+/** 
+ * Declare Variable
+ */
+
+let ss = SpreadsheetApp.getActiveSpreadsheet();
+let ui = SpreadsheetApp.getUi();
+var sheet = ss.getSheetByName("Form responses 8");
+
+
+//variable list
+let rmk = 'Remarks (if neccessary otherwise ignore)';
+let tg = 'Tag';
+let dot = 'Date of Application';
+let flt = 'flat';
+let d1 = 'Date of Application';
+let d2 = 'Date of Application (Option 2)';
+let fdrow = 45;
+let emel = 'Email address';
+
+//Stop exe = fail
+
+
+//Get Data
+var headers = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form responses 8").getRange("1:1").getValues()[0];  //headers
+
+var fd = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form responses 8").getRange(eval("`${fdrow}:${fdrow}`")).getValues()[0]; //form data
+
+
+
+
+function sub() {
+
+detSPR(fdrow);
+detblk(fdrow);
+detInvD(fdrow);
+detDupSub(fdrow);
+fd = fd2obj(fd);
+
+console.log(fd);
+
+for (keys in fd){
+  if(RegExp(dot).test(keys)){
+    for (alType in fd[keys]){
+    fd[keys][alType] = dtb.cdup([].concat(...fd[keys][alType].map( x => dtb.rdObj(x)) ).map( x => x.getTime()))}
+    }};
+
+console.log(fd);
+
+
+detCrash(fdrow);
+flatd1d2();
+
+console.log(fd);
+// console.log(Object.entries(fd));
+
+detSub();
+
+console.log(fd);
+
+
+}
+
+
+
+
+
+
+
+
+
