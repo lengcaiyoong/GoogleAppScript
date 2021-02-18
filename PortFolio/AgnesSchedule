@@ -3,8 +3,6 @@ function agnesAL() {
 let ss = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
 
-
-
 /**
  * Trigger Issue
  * https://developers.google.com/apps-script/guides/triggers/events
@@ -65,6 +63,7 @@ let ss = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 //change date to UTC +8
 // new Date( "date" + "UTC+0800");
 // new Date( "date" + "UTC+08:00");
+// new Date( "date" + "UTC+8");
 
 
 //get accurate millisecond
@@ -75,12 +74,16 @@ let ss = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 // var item = items[Math.floor(Math.random() * items.length)];
 
 
+// // set notes
+// ss.getActiveRange().setNotes(	[ [ '', '', 'dfdaf' ] ]
+
+
 
 // ////Set Background color
 //   var spreadsheet = SpreadsheetApp.getActive();
 //   spreadsheet.getRange('F24').activate();
 //   spreadsheet.getActiveRangeList().setBackground('#00ffff');
-
+// ss.getActiveRange().setBackgrounds([ [ '#ffffff', '#ffffff', '#ff9900' ] ])
 
 
 // End Here
@@ -167,117 +170,237 @@ function nonEmpty_LastRow(sheet, colA1){
     //console.log(`paste at row ${col_after + 1}`);
 
 
+//End here
 
 
-}
-
-
-
-function splitDate() {
-
-
-// Declare Variable
-var ss = SpreadsheetApp.getActiveSpreadsheet();
-var sheet = ss.getSheetByName("Form responses 8");
-
-var header = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form responses 8").getRange("A1:F1").getValues();
-
-var fd = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form responses 8").getRange("A39:F39").getValues(); //form data
+/** Ui Alert Return Error
+ * 
+ */
+  //let ui = SpreadsheetApp.getUi();
+  // if( a == 5 ){
+  // return ui.alert(`Sorry! You've run Code before!` );
+  //   ;
+  // }
+//End Here
 
 
 
+/** GEnerate UUID
+ * 
+ */
+  //var uuid = `${new Date("1 feb 2020").getTime()}${new Date().getTime()}`;
 
-// Parse into Object
-    var fdobj = header[0].reduce( (acc, cur, i) => {
-          acc[cur] = fd[0][i];
-            return acc
-       } ,{})
-
-    console.log(fdobj);
-
-// Split Date to 3 Groups (OBJECT)
-    
-for ( key in fdobj){
-  (key == 'Date of Application' | key == 'Date of Application (Option 2)')? (fdobj[key] = {
-  Full: ( fdobj[key].split(/[,，]/)).filter( x => !(/HF[12]/.test(x))) ,
-  HF1:  ( fdobj[key].split(/[,，]/)).filter( x => (/HF1/).test(x)),
-  HF2:  ( fdobj[key].split(/[,，]/)).filter( x => (/HF2/).test(x))}):''
-}
-
-      // console.log(fdobj);
+//End Here
 
 
 
-// Convert Date Function
-    //Need a Fn  convert to Normal Date
-      //range convert
-            //replace HF1
-               //re = /([\(（]\s*HF[12]\s*[\)）])\s*/
-            // new Date("15 Feb 2021 " + "UTC+8" )
-            //Utilities.formatDate(new Date(d2), "UTC+8", "dd MMM yyyy")
+
+/**  Flatten Objs to 2D Arrays
+ * 
+ */
+     //call each Dot Obj
+     //Create Flat obj in array -> 
+         //Object Entries + reduce loop each ALtype and element and add Al type tag
+         // [].concat([]) will return []
+         // [].filter(String) return []  
+
+    // let flatd1d2 = () => headers.map( (h,i) => 
+    // {if ( RegExp(dot).test(h) ){
+    // fd['flat '+h] =  Object.entries(fd[h]).reduce( (acc,cur,i) => 
+    //       acc.concat(cur[1].map( x => cur[0] + '-' + x   ))
+    //   ,[]).filter(x => x !== '')};
+    // });
+
+// End Here
+
+
+/** Get a set of days for a month
+   * 
+   * insert year and month (0 to 11)
+   */
+
+  // monthlist = (m,y) => {
+    //   return Array.from(
+    //     {length: new Date(y, m +1, 0).getDate()}, function(){ 
+    //   return new Date (  new Date(this.start).setDate(new Date(this.start).getDate()+ (this.factor++)) )
+    //   }
+    //  , {start: (new Date(new Date (y,m,1).toDateString() +'UTC+8')) ,factor: 0} 
+    //   );
+    // }
+
+    //Check if column number enough in a sheet
+        //ss.getMaxColumns() <32? ss.insertColumnsAfter( ss.getMaxColumns(), (31 - ss.getMaxColumns()) ):''
+
+    //ss.getRange( 19,1,1,monthlist(0,2021).length ).setValues( [monthlist(0,2021)]  )
+
+  //
+//End Here
+
+
+/**Split hyphenated Date into 3 groups
+ * Parse array into object
+ */
+
+  // // Declare Variable
+  // var ss = SpreadsheetApp.getActiveSpreadsheet();
+  // var sheet = ss.getSheetByName("Form responses 8");
+  // var header = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form responses 8").getRange("A1:F1").getValues();
+  // var fd = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form responses 8").getRange("A39:F39").getValues(); //form data
+
+  // // Parse into Object
+  //     var fdobj = header[0].reduce( (acc, cur, i) => {
+  //           acc[cur] = fd[0][i];
+  //             return acc
+  //       } ,{})
+
+  //     // console.log(fdobj);
+
+  // // Split Date to 3 Groups (OBJECT)
       
+  // for ( key in fdobj){
+  //   (key == 'Date of Application' | key == 'Date of Application (Option 2)')? (fdobj[key] = {
+  //   Full: ( fdobj[key].split(/[,，]/)).filter( x => !(/HF[12]/.test(x))).filter(String) ,
+  //   HF1:  ( fdobj[key].split(/[,，]/)).filter( x => (/HF1/).test(x)).filter(String),
+  //   HF2:  ( fdobj[key].split(/[,，]/)).filter( x => (/HF2/).test(x))}).filter(String):''
+  // }
 
-var s1 = '28 Jan 2021 ( HF1)'.replace(/([\(（]\s*HF[12]\s*[\)）])\s*/,'');
-var s2 = ' 5 Feb 2021  (HF2)'.replace(/([\(（]\s*HF[12]\s*[\)）])\s*/,'');
+  //       // console.log(fdobj);
 
-//get days
-var days = (Math.abs(new Date( s1 +'UTC+8' ).getTime()-new Date( s2 +'UTC+8' ).getTime()))/8.64e7+1;
-
-function drange(){ 
-  return new Date (  new Date(this.start).setDate(new Date(this.start).getDate()+ (this.factor++)) )
-  }
- let dateRange = Array.from(
-    {length: days}, drange, {start: ([s1,s2].sort( (a,b) => new Date(a + 'UTC+8') - new Date(b+ 'UTC+8') )[0])+'UTC+8',factor: 0} 
-  );
-
-//  console.log(dateRange);  //return date object list
+//End
 
 
+/**Get Date Range
+ */
+      //Need a Fn  convert to Normal Date
+        //range convert
+              //replace HF1
+                //re = /([\(（]\s*HF[12]\s*[\)）])\s*/
+              // new Date("15 Feb 2021 " + "UTC+8" )
+              //Utilities.formatDate(new Date(d2), "UTC+8", "dd MMM yyyy")
+        
 
+  // var s1 = '30 Sep 2021 ( HF1)'.replace(/([\(（]\s*HF[12]\s*[\)）])\s*/,'');
+  // var s2 = '30 Sep 2021  (HF2)'.replace(/([\(（]\s*HF[12]\s*[\)）])\s*/,'');
+
+  // //get days
+  // var days = (Math.abs(new Date( s1 +'UTC+8' ).getTime()-new Date( s2 +'UTC+8' ).getTime()))/8.64e7+1;
+
+  // function drange(){ 
+  //   return new Date (  new Date(this.start).setDate(new Date(this.start).getDate()+ (this.factor++)) )
+  //   }
+
+  // let dateRange = Array.from(
+  //     {length: days}, drange, {start: ([s1,s2].sort( (a,b) => new Date(a + 'UTC+8') - new Date(b+ 'UTC+8') )[0])+'UTC+8',factor: 0} 
+  //   );
+
+  // console.log(dateRange);  //return date object list
+
+//End
+
+
+// Split Date and convert it into time string
+  // var dd = [ '13 Sep 2021 - 15 Sep 2021', ' 30 Sep 2021\n' , '14 Sep 2021'];
+  // dd = dtb.cdup([].concat(...dd.map( x => dtb.rdObj(x)) ).map( x => x.getTime()));
+  
+  // //create a new property in object and store them in it
+
+  //   for (keys in fd){
+  //     if(RegExp(dot).test(keys)){
+  //       for (alType in fd[keys]){
+  //       fd[keys][alType] = dtb.cdup([].concat(...fd[keys][alType].map( x => dtb.rdObj(x)) ).map( x => x.getTime()))}
+  //       }};
+
+//End
+
+
+/** Flatten Object in a single Array
+ * 
+ */
+
+  // var objt = {
+  //   a:[1,3],
+  //   b:[2,4,5],
+  //   c:''
+  // }
+
+  // console.log(  Object.entries(objt).reduce( 
+  //   (acc, cur, ind) =>  acc.concat(...cur[1])
+  //   ,[]));
+
+//End
+
+
+//get dot and flat respectively
+  // let str = 'flatDate of Application (Option 2)'
+  // let str2 = 'Date of Application (Option 2)'
+  // console.log( RegExp('\\b'+dot).test(str) );
+  // console.log( RegExp('\\b'+dot).test(str2) )
+
+//End
 
 
 //Write in JSON column
-// SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form responses 8").getRange("I39").setValue(JSON.stringify(fdobj));
+  // SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form responses 8").getRange("I39").setValue(JSON.stringify(fdobj));
+
+//End
 
 
-}
 
 
-function invalidDate() {
+/** Duplicate Submit detect on Spreadsheet
+ * put this part after convert date to date object set 
+ */
+  // let detDupSub = (fdrow) => sheet.getRange(2,1,fdrow-2,headers.length).getValues().filter(
+  //   x => 
+  //   x[hIdxArr(emel)] == fd[hIdxArr(emel)] && 
+  //   x[hIdxArr(d1)] == fd[hIdxArr(d1)] && 
+  //   x[hIdxArr(d2)] == fd[hIdxArr(d2)] 
+  // ).length > 0? (ui.alert(`<<ERROR>>\n\n Agent submitted duplicate data before!`),sheet.getRange(fdrow,hIdxS(tg)).setValue("Duplicate Submit"),fail):'';
 
-var date_string = "21 Sep 2021 - 17 Sep 2021 (HF1),  18 Sep 2021 (HF2),  19 Sep 2021 (HF1), 20 Sep 2021".match(/(\d?\d\s+\w{3}\s+\d{4})/ig);
+//End
 
-var date_string2 = "13 Sep 2021 - 18 Sep 2021, 30 Sep 2021".match(/(\d?\d\s+\w{3}\s+\d{4})/ig);
 
-// console.log(date_string);
 
- function vdCheck(d){   //check if date is valid
-    let dy = d.match(/\b(0?[1-9]|[12]\d|30|31)\b/g);
-    let yea = d.match(/\d{4}/g);
-    let test_date = new Date(d );
-    return vdcheck =
-       test_date.getFullYear() == yea &&
-       test_date.getDate() == dy;
- } 
+/** Get Date from hyphenated format
+ * 
+ */
+  //var date_string = "21 Sep 2021 - 17 Sep 2021 (HF1),  18 Sep 2021 (HF2),  19 Sep 2021 (HF1), 20 Sep 2021".match(/(\d?\d\s+\w{3}\s+\d{4})/ig);
 
-// console.log(  vdCheck(date_string[0])); //31 Sep and 32 Sep is false
+  //var date_string2 = "13 Sep 2021 - 18 Sep 2021, 30 Sep 2021".match(/(\d?\d\s+\w{3}\s+\d{4})/ig);
+
+  //console.log(date_string);
+
+/** Check if date is valid
+ * 
+ */
+  // function vdCheck(d){   //check if date is valid
+  //     let dy = d.match(/\b(0?[1-9]|[12]\d|30|31)\b/g);
+  //     let yea = d.match(/\d{4}/g);
+  //     let test_date = new Date(d );
+  //     return vdcheck =
+  //       test_date.getFullYear() == yea &&
+  //       test_date.getDate() == dy;
+  // } 
+
+    //console.log(date_string[0]);
+    //console.log(  vdCheck(date_string[0])); //31 Sep and 32 Sep is false
+
+//End here
+
+
 
 
 //date Crash
   //Remember to convert to Millisecond or dateString if wanna use Set
+    //(new Set(date_string).size + new Set(date_string2).size) ==  new Set( date_string.concat(date_string2)).size;
 
+//End
 
-    (new Set(date_string).size + new Set(date_string2).size) ==  new Set( date_string.concat(date_string2)).size;
-
-
-//NaN date issue
-  // console.log( new Date("1 Feb 2021") );
-
-
-// Duplicate Name and Date
-  //use filter and length
 
 
 
 
 }
+
+
+
