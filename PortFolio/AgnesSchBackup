@@ -22,8 +22,10 @@ let dtb = {   //date tool box
           drange, 
           {start: (dtb.gd(dstr).sort( (a,b) => dtb.dObj(a) - dtb.dObj(b) )[0])+'UTC+8',factor: 0,});}
                 },
-    cdup(ts){return Array.from(new Set(ts))}
+    cdup(ts){return Array.from(new Set(ts))},
+    dmonth(utc8mili){ return new Date(utc8mili).toLocaleDateString('default',{month: 'short', timeZone:'Asia/Singapore'})} 
 }
+
 
 
 
@@ -136,7 +138,7 @@ let flatd1d2 = () => headers.map( (h,i) =>
           //swap flat and fd if required
 
 
-let detSub = () => Object.entries(fd).reduce( (acc,cur,i) => {
+  let detSub = () => Object.entries(fd).reduce( (acc,cur,i) => {
   
   if( RegExp(flt).test(cur[0]) && cur[1].length >0 && acc.length == 0  ){
       return acc.concat(cur)
@@ -182,67 +184,66 @@ let detSub = () => Object.entries(fd).reduce( (acc,cur,i) => {
 
 
 
-/** 
- * Declare Variable
- */
-
-let ss = SpreadsheetApp.getActiveSpreadsheet();
-let ui = SpreadsheetApp.getUi();
-var sheet = ss.getSheetByName("Form responses 8");
 
 
-//variable list
-let rmk = 'Remarks (if neccessary otherwise ignore)';
-let tg = 'Tag';
-let dot = 'Date of Application';
-let flt = 'flat';
-let d1 = 'Date of Application';
-let d2 = 'Date of Application (Option 2)';
-let fdrow = 45;
-let emel = 'Email address';
+// /** 
+//  * Declare Variable
+//  */
 
-//Stop exe = fail
+// let ss = SpreadsheetApp.getActiveSpreadsheet();
+// let ui = SpreadsheetApp.getUi();
+// var sheet = ss.getSheetByName("Form responses 8");
 
 
-//Get Data
-var headers = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form responses 8").getRange("1:1").getValues()[0];  //headers
+// //variable list
+// let rmk = 'Remarks (if neccessary otherwise ignore)';
+// let tg = 'Tag';
+// let dot = 'Date of Application';
+// let flt = 'flat';
+// let d1 = 'Date of Application';
+// let d2 = 'Date of Application (Option 2)';
+// let fdrow = 45;
+// let emel = 'Email address';
 
-var fd = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form responses 8").getRange(eval("`${fdrow}:${fdrow}`")).getValues()[0]; //form data
-
-
-
-
-function sub() {
-
-detSPR(fdrow);
-detblk(fdrow);
-detInvD(fdrow);
-detDupSub(fdrow);
-fd = fd2obj(fd);
-
-console.log(fd);
-
-for (keys in fd){
-  if(RegExp(dot).test(keys)){
-    for (alType in fd[keys]){
-    fd[keys][alType] = dtb.cdup([].concat(...fd[keys][alType].map( x => dtb.rdObj(x)) ).map( x => x.getTime()))}
-    }};
-
-console.log(fd);
+// //Stop exe = fail
 
 
-detCrash(fdrow);
-flatd1d2();
+// //Get Data
+// var headers = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form responses 8").getRange("1:1").getValues()[0];  //headers
 
-console.log(fd);
-// console.log(Object.entries(fd));
-
-detSub();
-
-console.log(fd);
+// var fd = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form responses 8").getRange(eval("`${fdrow}:${fdrow}`")).getValues()[0]; //form data
 
 
-}
+
+
+// function sub() {
+
+// detSPR(fdrow);
+// detblk(fdrow);
+// detInvD(fdrow);
+// detDupSub(fdrow);
+// fd = fd2obj(fd);
+
+// console.log(fd);
+
+// //split dates
+// for (keys in fd){
+//   if(RegExp(dot).test(keys)){
+//     for (alType in fd[keys]){
+//     fd[keys][alType] = dtb.cdup([].concat(...fd[keys][alType].map( x => dtb.rdObj(x)) ).map( x => x.getTime()))}
+//     }};
+
+// console.log(fd);
+
+
+// detCrash(fdrow);
+// flatd1d2();
+// detSub();
+
+// console.log(fd);
+
+
+// }
 
 
 
