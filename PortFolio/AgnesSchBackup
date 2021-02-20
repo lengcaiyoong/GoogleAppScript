@@ -96,18 +96,20 @@ let hIdxArr = (hname,headersData) =>  headersData.indexOf(hname); //Header index
  */
 
 //Special remark detection
-  let detSPR = (fdrow) => fd[hIdxArr(rmk,headers)] !== ''?(sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Special Remark"), ui.alert(`<<ERROR>>:\n\nSpecial Remark at row ${fdrow}`),fail):'';
+   let detSPR = (fdrow) => fd[hIdxArr(rmk,headers)] !== ''?(sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Special Remark"), console.error(`<<ERROR>>:\n\nSpecial Remark at row ${fdrow}`),fail):'';
+
+
 
   //Blank date detection
-  let detblk = (fdrow) => headers.reduce( (acc,cur, ind) => RegExp(dot).test(cur)?acc.concat([fd[ind]]):acc,[]).filter(x => x !=='').length == 0?(ui.alert(`<<ERROR>>\n\n Blank Dates at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Blank Dates"),fail):'';
+  let detblk = (fdrow) => headers.reduce( (acc,cur, ind) => RegExp(dot).test(cur)?acc.concat([fd[ind]]):acc,[]).filter(x => x !=='').length == 0?(console.error(`<<ERROR>>\n\n Blank Dates at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Blank Dates"),fail):'';
 //
 
 //Invalid date detection
   let detInvD = (fdrow) => headers.map( (h,i) => RegExp(dot).test(h)? (fd[i] == ''?'':
-    fd[i].match(/(\d?\d\s+\w{3}\s+\d{4})/ig)==null?(sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Invalid Date"),ui.alert(`Invalid date in data at row ${fdrow}`),fail):
+    fd[i].match(/(\d?\d\s+\w{3}\s+\d{4})/ig)==null?(sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Invalid Date"),console.error(`Invalid date in data at row ${fdrow}`),fail):
     
     (  fd[i].match(/(\d?\d\s+\w{3}\s+\d{4})/ig).forEach(  d => 
-      (vdCheck(d) == false)? (ui.alert(`<<ERROR>>\n\nInvalid Date Found at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Invalid Date"),fail):''
+      (vdCheck(d) == false)? (console.error(`<<ERROR>>\n\nInvalid Date Found at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Invalid Date"),fail):''
                                                     ))
 
     ):''
@@ -121,7 +123,7 @@ let hIdxArr = (hname,headersData) =>  headersData.indexOf(hname); //Header index
     x[hIdxArr(emel,headers)] == fd[hIdxArr(emel,headers)] && 
     x[hIdxArr(d1,headers)] == fd[hIdxArr(d1,headers)] && 
     x[hIdxArr(d2,headers)] == fd[hIdxArr(d2,headers)] 
-  ).length > 0? (ui.alert(`<<ERROR>>\n\n Agent submitted duplicate data before!`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Duplicate Submit"),fail):'';
+  ).length > 0? (console.error(`<<ERROR>>\n\n Agent submitted duplicate data before!`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Duplicate Submit"),fail):'';
 //
 
 
@@ -133,7 +135,7 @@ let detCrash = (fdrow) => headers.map( (h,i) =>
       var allALTYPE =   Object.entries(fd[h]).reduce( (acc, cur, ind) =>  
       acc.concat(...cur[1]),[]);
       allALTYPE.filter(x => x !== '').length == dtb.cdup(  allALTYPE  ).filter(x => x !== '').length?'':
-    (ui.alert(`<<ERROR>>\n\nDate Crash at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Date Crash"),fail)}});
+    (console.error(`<<ERROR>>\n\nDate Crash at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Date Crash"),fail)}});
 //
 
 
@@ -217,6 +219,8 @@ let flatd1d2 = () => headers.map( (h,i) =>
 
 
 //Detect if more than 1 month (comment)
+  //Regex to get monthlysheet
+    //RegExp(mth).test(cur[0])
     detCmt = (fd) => 
            dtb.cdup(
              Object.entries( fd ).reduce( (acc,cur,i) =>
@@ -239,7 +243,7 @@ let flatd1d2 = () => headers.map( (h,i) =>
 
 //// Plotting
     // Get PlotData, Run PlotData
-
+function plotInfo (){
   Object.entries( fd ).map( (x,i) => 
     { if(RegExp('\\b'+dot).test(x[0])) {       //keys of fd
 /**
@@ -349,11 +353,52 @@ let flatd1d2 = () => headers.map( (h,i) =>
   } //end for DoA
      }  // end for fd map
    );   // end for fd map
-
+};
+// To get monthlySheet , refer comment regex
 // End Plotting
 
 
+//Return JSON 
+writeJS = (fd) => sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).setValue( JSON.stringify( fd )   );
 
+
+//Delete Previous Data
+  //detect if any JSON
+      //sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).getValue( ) == '';
+  
+  // get all monthlysheet
+    //regex get all month sheet name, for 'of' loop find index and delete
+    //find out uuid and delete
+      //rowno = findIndex method + 1
+      //delete row 
+        //  ss.getSheetByName(key).deleteRow(rowno)
+
+
+    //if cannot find, leave tag, fail
+      //  sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue(  'Previous UUID Missing!' );
+
+delPreJS = (fdrow) => {
+    if (sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).getValue( ) !== ''){
+      
+      var allMonthlySheet = dtb.cdup(       //get month sheet
+             Object.entries( fd ).reduce( (acc,cur,i) =>
+               RegExp(mth).test(cur[0])? acc.concat( cur[1]):acc
+                  ,[]));
+
+    for ( monthsheet of allMonthlySheet ){   //for loop. delete row or return 'fail' if cannot find
+      var  monthIndex =  msdata(monthsheet).map(  x=> x[hIdxArr(id,msheader(monthsheet) )] ).findIndex( i => i == fd[id]) ;
+       monthIndex== -1 ? ( sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue(  'Previous UUID Missing!' ),console.error("Previous UUID MISSING"),fail ):( ss.getSheetByName(monthsheet).deleteRow(monthIndex+1), console.log('deleted previous data'));
+  
+    } //end for loop
+
+    } //end when Json is nonEmpty
+
+};  //end function delPreJS
+    
+    
+
+
+  
 
 
 
@@ -370,6 +415,7 @@ var sheet = ss.getSheetByName(response_sheetName);
 
 
 //variable list
+let js = 'JSON';
 let tstmp = 'Timestamp';
 let id = 'UUID';
 let full = 'Full';
@@ -389,16 +435,7 @@ let cmt = 'Comment';
 
 // color array
     //white '#ffffff'
-  let colors =  [ 
-      '#ffff00',
-      '#0000ff',
-      '#00ff00',
-      '#e69138',
-      '#ff0000',
-      '#9900ff',
-      '#00ffff' ];
-
-
+  let colors =  [ '#ffff00', '#0000ff',  '#00ff00',  '#e69138', '#ff0000', '#9900ff', '#00ffff' ];
 
 //Stop exe = fail
 
@@ -437,7 +474,7 @@ try {
           ) } }
         };
 } catch(error){
-    ui.alert(`<<ERROR>>\n\n There migh be invalid date at row ${fdrow}`);
+    console.error(`<<ERROR>>\n\n There migh be invalid date at row ${fdrow}`);
     sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Invalid Dates or Format");
     throw new Error("There might be invalid date or Format")
 }
@@ -461,19 +498,11 @@ colorpencil(fd);
 
   //console.log(  dtb.dmonth(fd['Date of Application']['Full'][0])  ) //get month
 
+// writeJS(fd);
+
+
    
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
