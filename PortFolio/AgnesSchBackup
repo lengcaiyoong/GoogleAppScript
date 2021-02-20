@@ -154,11 +154,11 @@ let flatd1d2 = () => headers.map( (h,i) =>
           acc.concat(cur[1].map( x => cur[0] + '-' + x   ))
       ,[]).filter(x => x !== '');
 
-    // fd['monthlySheet'+h] =  dtb.cdup(
-    //       Object.entries(fd[h]).reduce( (acc,cur,i) => 
-    //           acc.concat(cur[1].map( x => dtb.dmonth(x)   ))
-    //           ,[]).filter(x => x !== '')
-    //           );
+    fd[ mth +h] =  dtb.cdup(      //create month sheet
+          Object.entries(fd[h]).reduce( (acc,cur,i) => 
+              acc.concat(cur[1].map( x => dtb.dmonth(x)   ))
+              ,[]).filter(x => x !== '')
+              );
                                 };
     }
     );
@@ -216,27 +216,35 @@ let flatd1d2 = () => headers.map( (h,i) =>
   ,[]);
 
 
+//Detect if more than 1 month (comment)
+    detCmt = (fd) => 
+           dtb.cdup(
+             Object.entries( fd ).reduce( (acc,cur,i) =>
+               RegExp(mth).test(cur[0])? acc.concat( cur[1]):acc
+                  ,[])).length > 1? fd[cmt] = 'more than a month':'';
+
+
+
+
 //Swap DoA if 1st is empty
     //{ [objt3['arr1'], objt3['arr2']] = [objt3['arr2'], objt3['arr1']]};
 
 
 //Generate uuid
-  guuid = (fd) => fd['uuid'] = `${ fd[tstmp].getTime() }${new Date().getTime()}` ;
+  guuid = (fd) => fd[id] = `${ fd[tstmp].getTime() }${new Date().getTime()}` ;
 
 //Generate color
   colorpencil = (fd) => fd['color'] =  colors[Math.floor(Math.random() * colors.length)];
   
 
-// //Plotting
-//   //get DoA from Map
-//   // RegExp('\\b'+dot).test() 
-//   return object month array
-    //
+//// Plotting
+    // Get PlotData, Run PlotData
 
-Object.entries( fd ).map( (x,i) => 
-    {
-    if(RegExp('\\b'+dot).test(x[0]))        //keys of fd
-      {
+  Object.entries( fd ).map( (x,i) => 
+    { if(RegExp('\\b'+dot).test(x[0])) {       //keys of fd
+/**
+ * Get plotData
+ */
 
   var plotData =   Object.entries(fd[x[0]]).reduce(  (acc,cur,i) => //altype
     {
@@ -261,67 +269,90 @@ Object.entries( fd ).map( (x,i) =>
      }
      ,{});
     
-    //if all empty
-      // 1st DoA new RegExp("\\bDate of Application(?!\\s\\(Option 2\\))","ig").test(x[0])
 
-    if( plotData.length == 0 ){
+/** 
+ * Run plotData
+ */
+
+    if( plotData.length == 0 ){  //if empty
       console.log("Empty plotData detected");
-    }else if( new RegExp("\\bDate of Application(?!\\s\\(Option 2\\))","ig").test(x[0]) ) {
-
-      for (key in plotData){
+    }else{ 
+      for (key in plotData){   //loop each plotData
         
         //Variables
             // msdata(key) //whole sheet
             // msheader(key)   //get header
             // plotData[key]  // plot array
-        
-        //Actions:
-          // get_prRow(fd[tstmp],key); // generate row number for specific month sheet
-          // prRow //particular row
-          // ss.getSheetByName(key).insertRowAfter(prRow)
-  
-            //set backgrounds  
-          //  ss.getSheetByName(key).getRange( prRow+1, (msheader(key).map(  (x,i) => typeof x  ).indexOf('object')+1) , 1 , plotData.length  ).setBackgrounds( [plotData[key].map( p => typeof p == 'object'?'#ffffff':fd[clr] )]  )
-  
-            //set values        
-                //if more than 1 month, add comment
-          // ss.getSheetByName(key).getRange( prRow+1, 1 , 1 , msheader(key).filter(fil => fil !== '').length  ).setValues( [[ (Object.keys(plotData).length > 1? 'Agent Applied > 1 month':''), fd[id],fd[tstmp],fd[nm],fd[extmel]   ].concat(plotData[key].map( p => typeof p == 'object' || p == full?'':p ))] );
+    
+    //Get prRow
+     prRow = msdata(key).map( (x,i) => x[hIdxArr(id,msheader(key))]  ).findIndex(  x => x == fd[id] ) 
+     prRow == -1?(get_prRow(fd[tstmp],key),ss.getSheetByName(key).insertRowAfter(prRow)):console.log(`Found plotted Data before ${x[0]}`);   //need to insert row or use previous row data
 
-              // return month name
-          // fd['month'+x[0]] = Object.keys(plotData)
-
-      }
-    }else{
-        // comment if more than 1 month
-          //if no same uuid found, create new prRow
+    //Set Value and Notes/Background based conditionally  
+  if ( new RegExp("\\bDate of Application(?=\\s\\(Option 2\\))","ig").test(x[0]) ){
 
         //set notes
-        //  ss.getSheetByName(key).getRange( prRow+1, (msheader(key).map(  (x,i) => typeof x  ).indexOf('object')+1) , 1 , plotData.length  ).setNotes( [plotData[key].map( p => typeof p == 'object'?'':p )]  )
+  ss.getSheetByName(key)
+      .getRange( 
+            prRow+1, 
+            (msheader(key).map(  (x,i) => typeof x  ).indexOf('object')+1) , 
+            1 , 
+            plotData.length  )
+        .setNotes(  [plotData[key].map( p => typeof p == 'object'?'':p )]  )
 
-          // return month name
-        // fd['month'+x[0]] = Object.keys(plotData)
+      //set value, only write basic data on spreadsheet
+      ss.getSheetByName(key)
+            .getRange( 
+                    prRow+1, 
+                    msheader(key).findIndex( x => x !== '') + 1 , 
+                    1 , 
+                    msheader(key).filter( x=> typeof x !== 'object' || x !== '').length
+                      )
+            .setValues( 
+          [
+            msheader(key).filter( x=> typeof x !== 'object' || x !== '').map( y => fd[y] )
+          ]
+          );
+      //End setting notes and value
 
+    } else if ( new RegExp("\\bDate of Application(?!\\s\\(Option 2\\))","ig").test(x[0])  )
+    {
+        //set backgound
+  ss.getSheetByName(key)
+      .getRange( 
+            prRow+1, 
+            (msheader(key).map(  (x,i) => typeof x  ).indexOf('object')+1) , 
+            1 , 
+            plotData.length  )
+        .setBackgrounds( [plotData[key].map( p => typeof p == 'object'?'#ffffff':fd[clr] )]  )
 
+      //set value, write basic data and dateobj on spreadsheet
+      ss.getSheetByName(key)
+            .getRange( 
+                    prRow+1, 
+                    msheader(key).findIndex( x => x !== '') + 1 , 
+                    1 , 
+                    msheader(key).filter( x => x !== '' ).length
+                      )
+            .setValues( 
+          [
+            msheader(key).filter( x=> typeof x !== 'object' || x !== '').map( y => fd[y] )
+                .concat(plotData[key].map( p => typeof p == 'object' || p == full?'':p ))
+          ]
+          );
+          //End setting background and value
     }
-    
+
+    } //end for loop within plotData
+
+        } // end for  plotData.length > 0
+  } //end for DoA
+     }  // end for fd map
+   );   // end for fd map
+
+// End Plotting
 
 
-
-        
-        
-
-
-
-
-
-}
-     }
-
-
-
-   );
-
-  
 
 
 
@@ -340,19 +371,20 @@ var sheet = ss.getSheetByName(response_sheetName);
 
 //variable list
 let tstmp = 'Timestamp';
-let id = 'uuid';
-let nm = 'Full Name';
+let id = 'UUID';
 let full = 'Full';
 let rmk = 'Remarks (if neccessary otherwise ignore)';
 let tg = 'Tag';
 let dot = 'Date of Application';
 let flt = 'flat';
+let mth = 'monthlySheet';  //month sheet involved
 let d1 = 'Date of Application';
 let d2 = 'Date of Application (Option 2)';
 let fdrow = 45;
 let emel = 'Email address';
-let extmel = 'Ext Email';
 let color = 'clr';
+var prRow = '';
+let cmt = 'Comment';
 
 
 // color array
@@ -418,6 +450,8 @@ try {
 detCrash(fdrow);
 flatd1d2();
 detSub();
+detCmt(fd);
+
 guuid(fd);
 colorpencil(fd);
 
@@ -429,10 +463,6 @@ colorpencil(fd);
 
    
 }
-
-
-
-
 
 
 
