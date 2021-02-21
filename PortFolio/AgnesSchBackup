@@ -34,6 +34,28 @@ let dtb = {   //date tool box
 }
 
 
+// Split dates, clear duplicate w/in AL type, convert to time str
+    //give some feedback if date is invalid
+
+splitDATE = (fdrow, fd) => {
+try {
+    for (keys in fd){
+      if(RegExp(dot).test(keys)){
+        for (alType in fd[keys]){
+          fd[keys][alType] = dtb.cdup(
+            [].concat(...fd[keys][alType].map( x => dtb.rdObj(x)) ).map( x => x.getTime())
+          ) } }
+        };
+} catch(error){
+    console.error(`<<ERROR>>\n\n There might be invalid date at row ${fdrow}`);
+    sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Invalid Dates or Format");
+    throw new Error("There might be invalid date or Format")
+}
+}
+
+
+
+
 //Get Monthly SHeet data
   msdata = (sheetnamee) => ss.getSheetByName(sheetnamee).getDataRange().getValues();  //monthly sheet
 
@@ -114,7 +136,7 @@ let hIdxArr = (hname,headersData) =>  headersData.indexOf(hname); //Header index
 
 
 //Blank date detection  //check if both is blank
-  let detblk = (fdrow) => headers.reduce( (acc,cur, ind) => 
+  let detblk = (fd, fdrow) => headers.reduce( (acc,cur, ind) => 
     RegExp(dot).test(cur)?
       acc.concat([fd[ind]]):acc,[])
         .filter(x => x !=='').length == 0?
@@ -147,7 +169,7 @@ fd[hIdxArr( d1, headers )] == ''?
 
 
 //Invalid date detection
-  let detInvD = (fdrow) => headers.map( (h,i) => RegExp(dot).test(h)? (fd[i] == ''?'':
+  let detInvD = (fd, fdrow) => headers.map( (h,i) => RegExp(dot).test(h)? (fd[i] == ''?'':
     fd[i].match(/(\d?\d\s+\w{3}\s+\d{4})/ig)==null?(sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Invalid Date"),console.error(`Invalid date in data at row ${fdrow}`),fail):
     
     (  fd[i].match(/(\d?\d\s+\w{3}\s+\d{4})/ig).forEach(  d => 
@@ -160,7 +182,7 @@ fd[hIdxArr( d1, headers )] == ''?
 
 
 //Duplicate Submit
-  let detDupSub = (fdrow) => sheet.getRange(2,1,fdrow-2,headers.length).getValues().filter(
+  let detDupSub = (fd, fdrow) => sheet.getRange(2,1,fdrow-2,headers.length).getValues().filter(
     x => 
     x[hIdxArr(emel,headers)] == fd[hIdxArr(emel,headers)] && 
     x[hIdxArr(d1,headers)] == fd[hIdxArr(d1,headers)] && 
@@ -172,7 +194,7 @@ fd[hIdxArr( d1, headers )] == ''?
 //Date crash Detection
   //flatten object into array
   //use set size to check if duplicate
-let detCrash = (fdrow) => headers.map( (h,i) => 
+let detCrash = (fdrow, fd) => headers.map( (h,i) => 
 {if(RegExp(dot).test(h)){
       var allALTYPE =   Object.entries(fd[h]).reduce( (acc, cur, ind) =>  
       acc.concat(...cur[1]),[]);
@@ -191,7 +213,7 @@ let detCrash = (fdrow) => headers.map( (h,i) =>
         // [].concat([1]) return [1], same for [1].concat([])
   //Either Empty Skip, 
     //else (smallest or 2nd have all index >0) empty smallest
-let flatd1d2 = () => headers.map( (h,i) => 
+let flatd1d2 = (fd) => headers.map( (h,i) => 
     {if ( RegExp(dot).test(h) ){
 
     fd['flat'+h] =  Object.entries(fd[h]).reduce( (acc,cur,i) => 
@@ -222,7 +244,7 @@ let flatd1d2 = () => headers.map( (h,i) =>
           //swap flat and fd if required
 
 
-  let detSub = () => Object.entries(fd).reduce( (acc,cur,i) => {
+  let detSub = (fd) => Object.entries(fd).reduce( (acc,cur,i) => {
   
   if( RegExp(flt).test(cur[0]) && cur[1].length >0 && acc.length == 0  ){
       return acc.concat(cur)
@@ -470,7 +492,7 @@ let flatd1d2 = () => headers.map( (h,i) =>
                 RegExp(mth).test(cur[0])? acc.concat( cur[1]):acc
                     ,[]));
 
-                console.warn( allMonthlySheet); //consolelog checking
+                //console.warn( allMonthlySheet); //consolelog checking
                 //console.warn( JSON.parse(sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).getValue( ))[id] ); //consolelog checking
 
       for ( monthsheet of allMonthlySheet ){   //for loop. delete row or return 'fail' if cannot find
@@ -486,7 +508,7 @@ let flatd1d2 = () => headers.map( (h,i) =>
                 )
               .findIndex( i => i ==  JSON.parse(sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).getValue( ))[id] ) ;//previous JSON uuid
         
-               console.warn( monthIndex); //consolelog checking
+              // console.warn( monthIndex); //consolelog checking
 
         monthIndex== -1 ? ( sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue(  'Previous UUID Missing!' ),console.error("Previous UUID MISSING"),fail ):( ss.getSheetByName(monthsheet).deleteRow(monthIndex+1), console.log('deleted previous data'));
     
@@ -557,57 +579,37 @@ var fd = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(response_sheetName
 
 function sub() {
 
-  console.log(fd)
+      console.log(fd)
 
-detSPR(fdrow);
-swap( fd,d1,d2 ) // swap doA 1st and 2nd if 1st is blank
-detblk(fdrow);  // detect if both are blank
-detDobj(fdrow); //detect if date is in string format
-detInvD(fdrow);
-detDupSub(fdrow);
-fd = fd2obj(fd);
+  detSPR(fdrow);
+  swap( fd,d1,d2 ) // swap doA 1st and 2nd if 1st is blank
+  detblk(fd, fdrow);  // detect if both are blank
+  detDobj(fdrow); //detect if date is in string format
+  detInvD(fd, fdrow);
+  detDupSub(fd, fdrow);
 
-  console.log(fd);
+  fd = fd2obj(fd);  //fd convert to object
 
+      console.log(fd);
 
-//split dates, clear duplicate w/in AL type, convert to time str
-    //give some feedback if date is invalid
-try {
-    for (keys in fd){
-      if(RegExp(dot).test(keys)){
-        for (alType in fd[keys]){
-          fd[keys][alType] = dtb.cdup(
-            [].concat(...fd[keys][alType].map( x => dtb.rdObj(x)) ).map( x => x.getTime())
-          ) } }
-        };
-} catch(error){
-    console.error(`<<ERROR>>\n\n There might be invalid date at row ${fdrow}`);
-    sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Invalid Dates or Format");
-    throw new Error("There might be invalid date or Format")
-}
+  splitDATE(fdrow, fd) // split date, clear dup and convert to getTime()
 
+      console.log(fd);
 
-  console.log(fd);
+  detCrash(fdrow, fd);
+  flatd1d2(fd);
+  detSub(fd);
+  detCmt(fd);
+  guuid(fd);
+  colorpencil(fd);
 
+      console.log(fd);
 
-detCrash(fdrow);
-flatd1d2();
-detSub();
-detCmt(fd);
-guuid(fd);
-colorpencil(fd);
+  delPreJS(fdrow, fd);
+  plotInfo(fd);
+  writeJS(fdrow, fd);
 
-  console.log(fd);
-
-delPreJS(fdrow, fd);
-plotInfo(fd);
-writeJS(fdrow, fd);
-
-  console.log(fd);
-
-
-
-   
+      console.log(fd);
 }
 
 
