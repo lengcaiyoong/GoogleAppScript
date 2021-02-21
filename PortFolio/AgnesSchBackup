@@ -19,11 +19,18 @@ let dtb = {   //date tool box
      }else{ 
        return Array.from(
           {length: ((Math.abs(dtb.dObj(dtb.gd(dstr)[0] ).getTime()-dtb.dObj( dtb.gd(dstr)[1]).getTime()))/8.64e7+1)}, 
-          drange, 
-          {start: (dtb.gd(dstr).sort( (a,b) => dtb.dObj(a) - dtb.dObj(b) )[0])+'UTC+8',factor: 0,});}
+          function(){   //add 24 hours for each loop
+             return  new Date (  this.start.getTime() + (8.64e7 * this.factor++))  
+             }, 
+          {start: new Date((dtb.gd(dstr).sort( (a,b) => dtb.dObj(a) - dtb.dObj(b) )[0])+'UTC+8'),
+           factor: 0
+          }
+          );}
                 },
     cdup(ts){return Array.from(new Set(ts))},
-    dmonth(utc8mili){ return new Date(utc8mili).toLocaleDateString('default',{month: 'short', timeZone:'Asia/Singapore'})} 
+    dmonth(utc8mili){ return new Date(utc8mili).toLocaleDateString('default',{month: 'short', timeZone:'Asia/Singapore'})} ,
+    nummonth(utc8mili){ return new Date(utc8mili).toLocaleDateString('default',{month: 'numeric', timeZone:'Asia/Singapore'}) -1 } ,
+    dyear(utc8mili){ return new Date(utc8mili).toLocaleDateString('default',{year: 'numeric', timeZone:'Asia/Singapore'})} 
 }
 
 
@@ -68,20 +75,23 @@ let fdobj = headers.reduce( (acc, cur, i) => { acc[cur] = fd[i];return acc} ,{})
        test_date.getDate() == dy;
  } 
 
-function drange(){   //date range fn
-  return new Date (  new Date(this.start).setDate(new Date(this.start).getDate()+ (this.factor++)) )
-}
 
 
- monthlist = (m,y) => {       //create dates within a month
-      return Array.from(
-        {length: new Date(y, m +1, 0).getDate()}, function(){ 
-      return new Date (  new Date(this.start).setDate(new Date(this.start).getDate()+ (this.factor++)) )
+
+ monthlist = (m,y, d=1) => {     //by default d=1
+        return Array.from(
+          {   length:    
+            new Date( new Date( `${m+2}-${d}-2021 UTC+8`) -1 ).toLocaleDateString( 'default' ,{day: 'numeric', timeZone: 'Asia/Singapore'})   // Get Days of Last Day in month in UTC+8 
+              },  // End
+          
+          function(){   //add 24 hours for each loop
+        return  new Date (  this.start.getTime() + (8.64e7 * this.factor++))  
+        },   //End 
+        { start: ( new Date( `${m+1}-${d}-${y} UTC+8`) ) , //get Start Date of a month in Date Obj
+          factor: 0 
+          } // End
+        );
       }
-     , {start: (new Date(new Date (y,m,1).toDateString() +'UTC+8')) ,factor: 0} 
-      );
-     }
-
 
 
 /**
@@ -100,9 +110,25 @@ let hIdxArr = (hname,headersData) =>  headersData.indexOf(hname); //Header index
 
 
 
-  //Blank date detection
-  let detblk = (fdrow) => headers.reduce( (acc,cur, ind) => RegExp(dot).test(cur)?acc.concat([fd[ind]]):acc,[]).filter(x => x !=='').length == 0?(console.error(`<<ERROR>>\n\n Blank Dates at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Blank Dates"),fail):'';
-//
+//Blank date detection  //check if both is blank
+  let detblk = (fdrow) => headers.reduce( (acc,cur, ind) => 
+    RegExp(dot).test(cur)?
+      acc.concat([fd[ind]]):acc,[])
+        .filter(x => x !=='').length == 0?
+          (console.error(`<<ERROR>>\n\n Blank Dates at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Blank Dates"),fail)
+            :'';
+//End Here
+
+
+//Blank Swap (if 1st is blank but 2nd isn't)
+  //
+
+swap = ( fd,d1,d2 ) => 
+fd[hIdxArr( d1, headers )] == ''? 
+  (fd[hIdxArr( d1, headers )] = fd[hIdxArr( d2, headers )] ,fd[hIdxArr( d2, headers )]='' ):'';  
+
+
+
 
 //Invalid date detection
   let detInvD = (fdrow) => headers.map( (h,i) => RegExp(dot).test(h)? (fd[i] == ''?'':
@@ -222,10 +248,14 @@ let flatd1d2 = () => headers.map( (h,i) =>
   //Regex to get monthlysheet
     //RegExp(mth).test(cur[0])
     detCmt = (fd) => 
-           dtb.cdup(
+          {
+          var allMonthInvolved =  dtb.cdup(
              Object.entries( fd ).reduce( (acc,cur,i) =>
                RegExp(mth).test(cur[0])? acc.concat( cur[1]):acc
-                  ,[])).length > 1? fd[cmt] = 'more than a month':'';
+                  ,[]));
+          allMonthInvolved.length > 1? ( fd[cmt] = `more than 1 month \n( ${allMonthInvolved} )`
+                                      ):'';
+            }
 
 
 
@@ -241,11 +271,15 @@ let flatd1d2 = () => headers.map( (h,i) =>
   colorpencil = (fd) => fd['color'] =  colors[Math.floor(Math.random() * colors.length)];
   
 
+//Edit Here
+
+
 //// Plotting
     // Get PlotData, Run PlotData
-function plotInfo (){
+function plotInfo (fd){
   Object.entries( fd ).map( (x,i) => 
-    { if(RegExp('\\b'+dot).test(x[0])) {       //keys of fd
+    { 
+      if(RegExp('\\b'+dot).test(x[0])) {       //keys of fd
 /**
  * Get plotData
  */
@@ -256,31 +290,50 @@ function plotInfo (){
           //if keys undefined, create new keys
           {    
             if(acc[dtb.dmonth(cur2)]  == undefined ){   
-               acc[dtb.dmonth(cur2)] =  monthlist( new Date(cur2).getMonth() , new Date(cur2).getFullYear() );       //create list of dates
-               acc[dtb.dmonth(cur2)] = acc[dtb.dmonth(cur2)].map( j => { j.getTime()  
-                  .map( k =>  k == cur2?cur[0]:k)});   //convert time 2 keys
+               acc[dtb.dmonth(cur2)] =  monthlist( dtb.nummonth(cur2), dtb.dyear(cur2) );       //create list of dates
+               
+               //console.warn(acc); // consolelog checking
+               //console.warn(cur2, dtb.nummonth(cur2), dtb.dyear(cur2)  ); // consolelog checking
+               //console.warn (acc[dtb.dmonth(cur2)] ); // consolelog checking
+
+               acc[dtb.dmonth(cur2)] = acc[dtb.dmonth(cur2)].map( j =>  j.getTime()).map( k =>  k == cur2?cur[0]:k);   //convert time to keys
+                
+                //console.warn(acc ); // consolelog checking
+
               return acc2                                                
             }else{            
           //else paste related keys
-            acc[dtb.dmonth(cur2)] = acc[dtb.dmonth(cur2)].map( j =>  //list of date w/n a month
-                {j.getTime()  
-                  .map( k =>  k == cur2?cur[0]:k ); //convert time 2 keys if match
+              
+              //console.log(acc); // consolelog checking
+              //console.log(acc[dtb.dmonth(cur2)]); // consolelog checking
+
+            acc[dtb.dmonth(cur2)] = acc[dtb.dmonth(cur2)].map( k =>  k == cur2?cur[0]:k);
+
+                 // console.log(acc); // consolelog checking
+                  
                   return acc2
-                 })
+                 
                   }
-          },[]);
+          } // End reduce statement for Each Al type elements
+          ,[]); // End reduce
+         
+        // console.error (acc); // consolelog checking
+         
          return acc
      }
      ,{});
     
 
+//Hang Here
+
 /** 
  * Run plotData
  */
 
-    if( plotData.length == 0 ){  //if empty
-      console.log("Empty plotData detected");
+  if( Object.keys(plotData).length == 0 ){  //if empty
+      console.log("Empty plotData detected"); 
     }else{ 
+
       for (key in plotData){   //loop each plotData
         
         //Variables
@@ -289,20 +342,30 @@ function plotInfo (){
             // plotData[key]  // plot array
     
     //Get prRow
-     prRow = msdata(key).map( (x,i) => x[hIdxArr(id,msheader(key))]  ).findIndex(  x => x == fd[id] ) 
+     prRow = msdata(key).map( (x,i) => x[hIdxArr(id,msheader(key))]  ).findIndex(  x => x == fd[id] ); 
      prRow == -1?(get_prRow(fd[tstmp],key),ss.getSheetByName(key).insertRowAfter(prRow)):console.log(`Found plotted Data before ${x[0]}`);   //need to insert row or use previous row data
+
+    // console.warn(Object.keys(plotData), Object.keys(plotData).length ); //consolelog checking
+    // console.warn ( prRow); //consolelog checking
 
     //Set Value and Notes/Background based conditionally  
   if ( new RegExp("\\bDate of Application(?=\\s\\(Option 2\\))","ig").test(x[0]) ){
 
         //set notes
+
+    //console.warn(msheader(key).filter( x=> typeof x !== 'object').filter( x => x!== '').length) //consolelog checking
+
+    // console.warn(  [plotData[key].map( p => typeof p == 'number'?'':p )]  ); //consolelog checking
+
+    // console.warn(  msheader(key).filter( x=> typeof x !== 'object').filter( x => x!=='').map( y => fd[y] ) ); //consolelog checking
+
   ss.getSheetByName(key)
       .getRange( 
             prRow+1, 
             (msheader(key).map(  (x,i) => typeof x  ).indexOf('object')+1) , 
             1 , 
-            plotData.length  )
-        .setNotes(  [plotData[key].map( p => typeof p == 'object'?'':p )]  )
+            plotData[key].length  )
+        .setNotes(  [plotData[key].map( p => typeof p == 'number'?'':p )]  )
 
       //set value, only write basic data on spreadsheet
       ss.getSheetByName(key)
@@ -310,11 +373,12 @@ function plotInfo (){
                     prRow+1, 
                     msheader(key).findIndex( x => x !== '') + 1 , 
                     1 , 
-                    msheader(key).filter( x=> typeof x !== 'object' || x !== '').length
+                    msheader(key).filter( x=> typeof x !== 'object').filter( x => x!== '').length
                       )
             .setValues( 
           [
-            msheader(key).filter( x=> typeof x !== 'object' || x !== '').map( y => fd[y] )
+            msheader(key).filter( x=> typeof x !== 'object').filter( x => x!=='')
+            .map( y => fd[y] )
           ]
           );
       //End setting notes and value
@@ -322,13 +386,22 @@ function plotInfo (){
     } else if ( new RegExp("\\bDate of Application(?!\\s\\(Option 2\\))","ig").test(x[0])  )
     {
         //set backgound
+
+    //console.log([plotData[key].map( p => typeof p == 'number'?'#ffffff':fd[clr] )] ); //consolelog checking
+    //console.log( plotData[key].map( x=> (x == 'Full' || typeof x == 'number')?'':x ) ); //consolelog checking
+    // console.log( 
+    //   [msheader(key).filter( x=> typeof x !== 'object').filter( x => x !== '').map( y => fd[y] ).concat(plotData[key].map(  p=> (p == 'Full' || typeof p == 'number')?'':p    ))]
+    // ); //consolelog checking
+    // console.log( plotData[key].length)  //consolelog checking
+    
+
   ss.getSheetByName(key)
       .getRange( 
             prRow+1, 
             (msheader(key).map(  (x,i) => typeof x  ).indexOf('object')+1) , 
             1 , 
-            plotData.length  )
-        .setBackgrounds( [plotData[key].map( p => typeof p == 'object'?'#ffffff':fd[clr] )]  )
+            plotData[key].length  )
+        .setBackgrounds( [plotData[key].map( p => typeof p == 'number'?'#ffffff':fd[clr] )]  )
 
       //set value, write basic data and dateobj on spreadsheet
       ss.getSheetByName(key)
@@ -339,23 +412,27 @@ function plotInfo (){
                     msheader(key).filter( x => x !== '' ).length
                       )
             .setValues( 
-          [
-            msheader(key).filter( x=> typeof x !== 'object' || x !== '').map( y => fd[y] )
-                .concat(plotData[key].map( p => typeof p == 'object' || p == full?'':p ))
-          ]
+           [msheader(key).filter( x=> typeof x !== 'object').filter( x => x !== '').map( y => fd[y] ).concat(plotData[key].map(  p=> (p == 'Full' || typeof p == 'number')?'':p    ))]
           );
           //End setting background and value
     }
 
     } //end for loop within plotData
 
-        } // end for  plotData.length > 0
+        } // end for  Object.keys(plotData).length > 0
+
+//Hang Here
+
+
   } //end for DoA
      }  // end for fd map
    );   // end for fd map
 };
 // To get monthlySheet , refer comment regex
 // End Plotting
+
+
+//End Edit here
 
 
 //Return JSON 
@@ -401,7 +478,6 @@ delPreJS = (fdrow) => {
   
 
 
-
 /** 
  * Declare Variable
  */
@@ -426,9 +502,9 @@ let flt = 'flat';
 let mth = 'monthlySheet';  //month sheet involved
 let d1 = 'Date of Application';
 let d2 = 'Date of Application (Option 2)';
-let fdrow = 45;
+let fdrow = 46;
 let emel = 'Email address';
-let color = 'clr';
+let clr = 'color';
 var prRow = '';
 let cmt = 'Comment';
 
@@ -452,8 +528,10 @@ var fd = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(response_sheetName
 
 function sub() {
 
+console.log(fd)
 detSPR(fdrow);
-detblk(fdrow);
+swap( fd,d1,d2 ) // swap doA 1st and 2nd if 1st is blank
+detblk(fdrow);  // detect if both are blank
 detInvD(fdrow);
 detDupSub(fdrow);
 fd = fd2obj(fd);
@@ -474,7 +552,7 @@ try {
           ) } }
         };
 } catch(error){
-    console.error(`<<ERROR>>\n\n There migh be invalid date at row ${fdrow}`);
+    console.error(`<<ERROR>>\n\n There might be invalid date at row ${fdrow}`);
     sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Invalid Dates or Format");
     throw new Error("There might be invalid date or Format")
 }
@@ -493,16 +571,24 @@ guuid(fd);
 colorpencil(fd);
 
 
-  // console.log(fd.uuid);
+// console.log(fd.uuid);
   console.log(fd);
 
-  //console.log(  dtb.dmonth(fd['Date of Application']['Full'][0])  ) //get month
 
+plotInfo (fd);
+
+console.log(fd);
+
+//console.log(  dtb.dmonth(fd['Date of Application']['Full'][0])  ) //get month
 // writeJS(fd);
+
 
 
    
 }
+
+
+
 
 
 
