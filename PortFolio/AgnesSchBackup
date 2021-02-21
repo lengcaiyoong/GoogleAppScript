@@ -619,6 +619,83 @@ function sub() {
 
 
 
+function monthTemplate() {
+
+let ss = SpreadsheetApp.getActiveSpreadsheet();
+let ui = SpreadsheetApp.getUi();
+
+//let fail as stop execute
+
+let startMonth = 8;   //0 stands for Jan
+let endMonth = 8;
+
+let input = ui.prompt( 'Please Insert the year' ) ;
+let year = input.getResponseText();
+
+
+
+( !(parseInt(year) < 2100 ) || !(parseInt(year) > 2020) || year.length !== 4 || !(/\d{4}/.test(year)) || input.getSelectedButton() == ui.Button.CLOSE || isNaN(parseInt(year))|| parseInt(year) == '')? (ui.alert('Please Insert Valid Year'),console.error('Insert Invalid Year'),fail):'';
+
+console.log('cont...')
+
+let columnheader =  ['Comment',
+'UUID',
+'Timestamp',
+'Full Name',
+'Email address'];
+
+
+
+
+ for ( i = startMonth; i<= endMonth; i++ ){   //for loop
+    var nmMonth = dtb.dmonth( monthlist( i , year )[0] .getTime());  //get name of month
+    
+    ss.insertSheet(nmMonth, i+1);    //insert Sheet
+
+    //Declare Variable
+    var maxcol = ss.getSheetByName(nmMonth).getMaxColumns();
+    var maxrow = ss.getSheetByName(nmMonth).getMaxRows();
+    var tcol = columnheader.length + monthlist( i , year ).length;
+    var trow = 10;
+
+ 
+    // // Adjust Rows and Cols numbers
+     maxcol !== tcol? 
+     (maxcol < tcol? (ss.getSheetByName(nmMonth).insertColumns( 1 ,  Math.abs(maxcol - tcol)  ))
+    :ss.getSheetByName(nmMonth).deleteColumns(1, Math.abs(maxcol - tcol))):''
+
+    maxrow !== trow? 
+     (maxrow < trow? (ss.getSheetByName(nmMonth).insertRows( 1 ,  Math.abs(maxrow - trow)  ))
+    :ss.getSheetByName(nmMonth).deleteRows(1, Math.abs(maxrow - trow))):''
+
+     ss.getSheetByName(nmMonth).getRange('1:1').setValues(     //insert Headers
+        [columnheader.concat( 
+          monthlist( i , year ))]
+     ); 
+      }//end for loop
+
+
+}
+
+
+ monthlist = (m,y, d=1) => {     //by default d=1
+        return Array.from(
+          {   length:    
+            new Date( new Date( `${m+2}-${d}-2021 UTC+8`) -1 ).toLocaleDateString( 'default' ,{day: 'numeric', timeZone: 'Asia/Singapore'})   // Get Days of Last Day in month in UTC+8 
+              },  // End
+          
+          function(){   //add 24 hours for each loop
+        return  new Date (  this.start.getTime() + (8.64e7 * this.factor++))  
+        },   //End 
+        { start: ( new Date( `${m+1}-${d}-${y} UTC+8`) ) , //get Start Date of a month in Date Obj
+          factor: 0 
+          } // End
+        );
+      }
+
+
+
+
 
 
 
