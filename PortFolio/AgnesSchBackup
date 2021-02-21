@@ -34,10 +34,10 @@ let dtb = {   //date tool box
 }
 
 
-// Split dates, clear duplicate w/in AL type, convert to time str
+// clear duplicate w/in AL type, convert to time str
     //give some feedback if date is invalid
 
-splitDATE = (fdrow, fd) => {
+dateClean = (fdrow, fd) => {
 try {
     for (keys in fd){
       if(RegExp(dot).test(keys)){
@@ -385,7 +385,7 @@ let flatd1d2 = (fd) => headers.map( (h,i) =>
       // console.warn ( prRow); //consolelog checking
 
       //Set Value and Notes/Background based conditionally  
-    if ( new RegExp("\\bDate of Application(?=\\s\\(Option 2\\))","ig").test(x[0]) ){
+    if ( new RegExp(reDOA2,"ig").test(x[0]) ){
 
           //set notes
 
@@ -419,7 +419,7 @@ let flatd1d2 = (fd) => headers.map( (h,i) =>
             );
         //End setting notes and value
 
-      } else if ( new RegExp("\\bDate of Application(?!\\s\\(Option 2\\))","ig").test(x[0])  )
+      } else if ( new RegExp(reDOA1,"ig").test(x[0])  )
       {
           //set backgound
 
@@ -469,20 +469,6 @@ let flatd1d2 = (fd) => headers.map( (h,i) =>
 
 
 //Delete Previous Data
-    //detect if any JSON
-        //sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).getValue( ) == '';
-    
-    // get all monthlysheet
-      //regex get all month sheet name, for 'of' loop find index and delete
-      //find out uuid and delete
-        //rowno = findIndex method + 1
-        //delete row 
-          //  ss.getSheetByName(key).deleteRow(rowno)
-
-      //if cannot find, leave tag, fail
-        //  sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue(  'Previous UUID Missing!' );
-
-
 
   delPreJS = (fdrow, fd) => {
       if ( sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).getValue( ) !== '' ){
@@ -524,7 +510,18 @@ let flatd1d2 = (fd) => headers.map( (h,i) =>
 
   
 //Return JSON 
-writeJS = (fdrow, fd) => sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).setValue( JSON.stringify( fd )   );
+writeJS = (fdrow, fd) => {
+
+try{
+  delete fd[js] ;       // clear Previous JSON before write it, otherwise >5000 word in a cell
+  sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).setValue( JSON.stringify( fd )   )
+}catch(error){
+  sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("JSON too large");
+  console.error(`<<ERROR>>:\n\nJSON File Too Large`);
+  fail;
+}
+
+};
 
 
 
@@ -538,8 +535,6 @@ let ui = SpreadsheetApp.getUi();
 let response_sheetName = "Form responses 8";
 
 var sheet = ss.getSheetByName(response_sheetName);
-
-
 
 //variable list
 let js = 'JSON';
@@ -558,14 +553,14 @@ let emel = 'Email address';
 let clr = 'color';
 var prRow = '';
 let cmt = 'Comment';
-
+let reDOA1 = "\\b"+dot+"(?!\\s\\(Option 2\\))";
+let reDOA2 = "\\b"+dot+"(?=\\s\\(Option 2\\))";
 
 // color array
     //white '#ffffff'
   let colors =  [ '#ffff00', '#0000ff',  '#00ff00',  '#e69138', '#ff0000', '#9900ff', '#00ffff' ];
 
 //Stop exe = fail
-
 
 //Get Data
 let headers = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(response_sheetName).getRange("1:1").getValues()[0];  //headers
@@ -592,7 +587,7 @@ function sub() {
 
       console.log(fd);
 
-  splitDATE(fdrow, fd) // split date, clear dup and convert to getTime()
+  dateClean(fdrow, fd) // split date, clear dup and convert to getTime()
 
       console.log(fd);
 
@@ -603,14 +598,22 @@ function sub() {
   guuid(fd);
   colorpencil(fd);
 
-      console.log(fd);
 
   delPreJS(fdrow, fd);
-  plotInfo(fd);
-  writeJS(fdrow, fd);
+      console.warn(fd,  Object.keys(fd).length );
 
-      console.log(fd);
+  plotInfo(fd);
+      console.log(fd ,  Object.keys(fd).length);
+  
+  writeJS(fdrow, fd);
+      console.warn(fd ,  Object.keys(fd).length);  
+  
 }
+
+
+
+
+
 
 
 
