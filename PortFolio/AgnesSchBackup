@@ -101,6 +101,9 @@ let hIdxS = (hname,headersData) =>  headersData.indexOf(hname)+1; //Header index
 let hIdxArr = (hname,headersData) =>  headersData.indexOf(hname); //Header index for array usage
 
 
+
+
+
 /**
  * Invalid Detection
  */
@@ -118,6 +121,19 @@ let hIdxArr = (hname,headersData) =>  headersData.indexOf(hname); //Header index
           (console.error(`<<ERROR>>\n\n Blank Dates at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Blank Dates"),fail)
             :'';
 //End Here
+
+
+
+//Invalid Date Format (Only Date String Allowed)
+let detDobj = (fdrow) => headers.map( (h,i) => RegExp(dot).test(h)?
+  (
+    typeof fd[i] !== 'object'? '': 
+  (sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Invalid Format"), 
+    console.error(`<<ERROR>>:\n\nDate not in Text Format at row ${fdrow}`),
+    fail))
+    :'');
+// End Here
+
 
 
 //Blank Swap (if 1st is blank but 2nd isn't)
@@ -265,217 +281,230 @@ let flatd1d2 = () => headers.map( (h,i) =>
 
 
 //Generate uuid
-  guuid = (fd) => fd[id] = `${ fd[tstmp].getTime() }${new Date().getTime()}` ;
+  guuid = (fd) => fd[id] = `${['t','g','z'][Math.floor(Math.random() * ['a','b','c'].length)]}${ fd[tstmp].getTime() }${new Date().getTime()}` ;
 
 //Generate color
   colorpencil = (fd) => fd['color'] =  colors[Math.floor(Math.random() * colors.length)];
   
 
-//Edit Here
-
 
 //// Plotting
-    // Get PlotData, Run PlotData
-function plotInfo (fd){
-  Object.entries( fd ).map( (x,i) => 
-    { 
-      if(RegExp('\\b'+dot).test(x[0])) {       //keys of fd
-/**
- * Get plotData
- */
+      // Get PlotData, Run PlotData
+  function plotInfo (fd){
+    Object.entries( fd ).map( (x,i) => 
+      { 
+        if(RegExp('\\b'+dot).test(x[0])) {       //keys of fd
+  /**
+   * Get plotData
+   */
 
-  var plotData =   Object.entries(fd[x[0]]).reduce(  (acc,cur,i) => //altype
-    {
-      cur[1].reduce( (acc2,cur2,ind) =>  //element in altype, cur[0] is key
-          //if keys undefined, create new keys
-          {    
-            if(acc[dtb.dmonth(cur2)]  == undefined ){   
-               acc[dtb.dmonth(cur2)] =  monthlist( dtb.nummonth(cur2), dtb.dyear(cur2) );       //create list of dates
-               
-               //console.warn(acc); // consolelog checking
-               //console.warn(cur2, dtb.nummonth(cur2), dtb.dyear(cur2)  ); // consolelog checking
-               //console.warn (acc[dtb.dmonth(cur2)] ); // consolelog checking
-
-               acc[dtb.dmonth(cur2)] = acc[dtb.dmonth(cur2)].map( j =>  j.getTime()).map( k =>  k == cur2?cur[0]:k);   //convert time to keys
+    var plotData =   Object.entries(fd[x[0]]).reduce(  (acc,cur,i) => //altype
+      {
+        cur[1].reduce( (acc2,cur2,ind) =>  //element in altype, cur[0] is key
+            //if keys undefined, create new keys
+            {    
+              if(acc[dtb.dmonth(cur2)]  == undefined ){   
+                acc[dtb.dmonth(cur2)] =  monthlist( dtb.nummonth(cur2), dtb.dyear(cur2) );       //create list of dates
                 
-                //console.warn(acc ); // consolelog checking
+                //console.warn(acc); // consolelog checking
+                //console.warn(cur2, dtb.nummonth(cur2), dtb.dyear(cur2)  ); // consolelog checking
+                //console.warn (acc[dtb.dmonth(cur2)] ); // consolelog checking
 
-              return acc2                                                
-            }else{            
-          //else paste related keys
-              
-              //console.log(acc); // consolelog checking
-              //console.log(acc[dtb.dmonth(cur2)]); // consolelog checking
-
-            acc[dtb.dmonth(cur2)] = acc[dtb.dmonth(cur2)].map( k =>  k == cur2?cur[0]:k);
-
-                 // console.log(acc); // consolelog checking
+                acc[dtb.dmonth(cur2)] = acc[dtb.dmonth(cur2)].map( j =>  j.getTime()).map( k =>  k == cur2?cur[0]:k);   //convert time to keys
                   
-                  return acc2
-                 
-                  }
-          } // End reduce statement for Each Al type elements
-          ,[]); // End reduce
-         
-        // console.error (acc); // consolelog checking
-         
-         return acc
-     }
-     ,{});
-    
+                  //console.warn(acc ); // consolelog checking
 
-//Hang Here
+                return acc2                                                
+              }else{            
+            //else paste related keys
+                
+                //console.log(acc); // consolelog checking
+                //console.log(acc[dtb.dmonth(cur2)]); // consolelog checking
 
-/** 
- * Run plotData
- */
+              acc[dtb.dmonth(cur2)] = acc[dtb.dmonth(cur2)].map( k =>  k == cur2?cur[0]:k);
 
-  if( Object.keys(plotData).length == 0 ){  //if empty
-      console.log("Empty plotData detected"); 
-    }else{ 
-
-      for (key in plotData){   //loop each plotData
-        
-        //Variables
-            // msdata(key) //whole sheet
-            // msheader(key)   //get header
-            // plotData[key]  // plot array
-    
-    //Get prRow
-     prRow = msdata(key).map( (x,i) => x[hIdxArr(id,msheader(key))]  ).findIndex(  x => x == fd[id] ); 
-     prRow == -1?(get_prRow(fd[tstmp],key),ss.getSheetByName(key).insertRowAfter(prRow)):console.log(`Found plotted Data before ${x[0]}`);   //need to insert row or use previous row data
-
-    // console.warn(Object.keys(plotData), Object.keys(plotData).length ); //consolelog checking
-    // console.warn ( prRow); //consolelog checking
-
-    //Set Value and Notes/Background based conditionally  
-  if ( new RegExp("\\bDate of Application(?=\\s\\(Option 2\\))","ig").test(x[0]) ){
-
-        //set notes
-
-    //console.warn(msheader(key).filter( x=> typeof x !== 'object').filter( x => x!== '').length) //consolelog checking
-
-    // console.warn(  [plotData[key].map( p => typeof p == 'number'?'':p )]  ); //consolelog checking
-
-    // console.warn(  msheader(key).filter( x=> typeof x !== 'object').filter( x => x!=='').map( y => fd[y] ) ); //consolelog checking
-
-  ss.getSheetByName(key)
-      .getRange( 
-            prRow+1, 
-            (msheader(key).map(  (x,i) => typeof x  ).indexOf('object')+1) , 
-            1 , 
-            plotData[key].length  )
-        .setNotes(  [plotData[key].map( p => typeof p == 'number'?'':p )]  )
-
-      //set value, only write basic data on spreadsheet
-      ss.getSheetByName(key)
-            .getRange( 
-                    prRow+1, 
-                    msheader(key).findIndex( x => x !== '') + 1 , 
-                    1 , 
-                    msheader(key).filter( x=> typeof x !== 'object').filter( x => x!== '').length
-                      )
-            .setValues( 
-          [
-            msheader(key).filter( x=> typeof x !== 'object').filter( x => x!=='')
-            .map( y => fd[y] )
-          ]
-          );
-      //End setting notes and value
-
-    } else if ( new RegExp("\\bDate of Application(?!\\s\\(Option 2\\))","ig").test(x[0])  )
-    {
-        //set backgound
-
-    //console.log([plotData[key].map( p => typeof p == 'number'?'#ffffff':fd[clr] )] ); //consolelog checking
-    //console.log( plotData[key].map( x=> (x == 'Full' || typeof x == 'number')?'':x ) ); //consolelog checking
-    // console.log( 
-    //   [msheader(key).filter( x=> typeof x !== 'object').filter( x => x !== '').map( y => fd[y] ).concat(plotData[key].map(  p=> (p == 'Full' || typeof p == 'number')?'':p    ))]
-    // ); //consolelog checking
-    // console.log( plotData[key].length)  //consolelog checking
-    
-
-  ss.getSheetByName(key)
-      .getRange( 
-            prRow+1, 
-            (msheader(key).map(  (x,i) => typeof x  ).indexOf('object')+1) , 
-            1 , 
-            plotData[key].length  )
-        .setBackgrounds( [plotData[key].map( p => typeof p == 'number'?'#ffffff':fd[clr] )]  )
-
-      //set value, write basic data and dateobj on spreadsheet
-      ss.getSheetByName(key)
-            .getRange( 
-                    prRow+1, 
-                    msheader(key).findIndex( x => x !== '') + 1 , 
-                    1 , 
-                    msheader(key).filter( x => x !== '' ).length
-                      )
-            .setValues( 
-           [msheader(key).filter( x=> typeof x !== 'object').filter( x => x !== '').map( y => fd[y] ).concat(plotData[key].map(  p=> (p == 'Full' || typeof p == 'number')?'':p    ))]
-          );
-          //End setting background and value
-    }
-
-    } //end for loop within plotData
-
-        } // end for  Object.keys(plotData).length > 0
-
-//Hang Here
+                  // console.log(acc); // consolelog checking
+                    
+                    return acc2
+                  
+                    }
+            } // End reduce statement for Each Al type elements
+            ,[]); // End reduce
+          
+          // console.error (acc); // consolelog checking
+          
+          return acc
+      }
+      ,{});
+      
 
 
-  } //end for DoA
-     }  // end for fd map
-   );   // end for fd map
-};
-// To get monthlySheet , refer comment regex
+
+  /** 
+   * Run plotData
+   */
+
+    if( Object.keys(plotData).length == 0 ){  //if empty
+        console.log("Empty plotData detected"); 
+      }else{ 
+
+        for (key in plotData){   //loop each plotData
+          
+          //Variables
+              // msdata(key) //whole sheet
+              // msheader(key)   //get header
+              // plotData[key]  // plot array
+      
+      //Get prRow
+      prRow = msdata(key).map( (x,i) => x[hIdxArr(id,msheader(key))]  ).findIndex(  x => x == fd[id] ); 
+      prRow == -1?(get_prRow(fd[tstmp],key),ss.getSheetByName(key).insertRowAfter(prRow)):console.log(`Found plotted Data before ${x[0]}`);   //need to insert row or use previous row data
+
+      // console.warn(Object.keys(plotData), Object.keys(plotData).length ); //consolelog checking
+      // console.warn ( prRow); //consolelog checking
+
+      //Set Value and Notes/Background based conditionally  
+    if ( new RegExp("\\bDate of Application(?=\\s\\(Option 2\\))","ig").test(x[0]) ){
+
+          //set notes
+
+      //console.warn(msheader(key).filter( x=> typeof x !== 'object').filter( x => x!== '').length) //consolelog checking
+
+      // console.warn(  [plotData[key].map( p => typeof p == 'number'?'':p )]  ); //consolelog checking
+
+      // console.warn(  msheader(key).filter( x=> typeof x !== 'object').filter( x => x!=='').map( y => fd[y] ) ); //consolelog checking
+
+    ss.getSheetByName(key)
+        .getRange( 
+              prRow+1, 
+              (msheader(key).map(  (x,i) => typeof x  ).indexOf('object')+1) , 
+              1 , 
+              plotData[key].length  )
+          .setNotes(  [plotData[key].map( p => typeof p == 'number'?'':p )]  )
+
+        //set value, only write basic data on spreadsheet
+        ss.getSheetByName(key)
+              .getRange( 
+                      prRow+1, 
+                      msheader(key).findIndex( x => x !== '') + 1 , 
+                      1 , 
+                      msheader(key).filter( x=> typeof x !== 'object').filter( x => x!== '').length
+                        )
+              .setValues( 
+            [
+              msheader(key).filter( x=> typeof x !== 'object').filter( x => x!=='')
+              .map( y => fd[y] )
+            ]
+            );
+        //End setting notes and value
+
+      } else if ( new RegExp("\\bDate of Application(?!\\s\\(Option 2\\))","ig").test(x[0])  )
+      {
+          //set backgound
+
+      //console.log([plotData[key].map( p => typeof p == 'number'?'#ffffff':fd[clr] )] ); //consolelog checking
+      //console.log( plotData[key].map( x=> (x == 'Full' || typeof x == 'number')?'':x ) ); //consolelog checking
+      // console.log( 
+      //   [msheader(key).filter( x=> typeof x !== 'object').filter( x => x !== '').map( y => fd[y] ).concat(plotData[key].map(  p=> (p == 'Full' || typeof p == 'number')?'':p    ))]
+      // ); //consolelog checking
+      // console.log( plotData[key].length)  //consolelog checking
+      
+
+    ss.getSheetByName(key)
+        .getRange( 
+              prRow+1, 
+              (msheader(key).map(  (x,i) => typeof x  ).indexOf('object')+1) , 
+              1 , 
+              plotData[key].length  )
+          .setBackgrounds( [plotData[key].map( p => typeof p == 'number'?'#ffffff':fd[clr] )]  )
+
+        //set value, write basic data and dateobj on spreadsheet
+        ss.getSheetByName(key)
+              .getRange( 
+                      prRow+1, 
+                      msheader(key).findIndex( x => x !== '') + 1 , 
+                      1 , 
+                      msheader(key).filter( x => x !== '' ).length
+                        )
+              .setValues( 
+            [msheader(key).filter( x=> typeof x !== 'object').filter( x => x !== '').map( y => fd[y] ).concat(plotData[key].map(  p=> (p == 'Full' || typeof p == 'number')?'':p    ))]
+            );
+            //End setting background and value
+      }
+
+      } //end for loop within plotData
+
+          } // end for  Object.keys(plotData).length > 0
+
+
+    } //end for DoA
+      }  // end for fd map
+    );   // end for fd map
+  };
+  // To get monthlySheet , refer comment regex
 // End Plotting
 
 
-//End Edit here
-
-
-//Return JSON 
-writeJS = (fd) => sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).setValue( JSON.stringify( fd )   );
 
 
 //Delete Previous Data
-  //detect if any JSON
-      //sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).getValue( ) == '';
-  
-  // get all monthlysheet
-    //regex get all month sheet name, for 'of' loop find index and delete
-    //find out uuid and delete
-      //rowno = findIndex method + 1
-      //delete row 
-        //  ss.getSheetByName(key).deleteRow(rowno)
-
-
-    //if cannot find, leave tag, fail
-      //  sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue(  'Previous UUID Missing!' );
-
-delPreJS = (fdrow) => {
-    if (sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).getValue( ) !== ''){
-      
-      var allMonthlySheet = dtb.cdup(       //get month sheet
-             Object.entries( fd ).reduce( (acc,cur,i) =>
-               RegExp(mth).test(cur[0])? acc.concat( cur[1]):acc
-                  ,[]));
-
-    for ( monthsheet of allMonthlySheet ){   //for loop. delete row or return 'fail' if cannot find
-      var  monthIndex =  msdata(monthsheet).map(  x=> x[hIdxArr(id,msheader(monthsheet) )] ).findIndex( i => i == fd[id]) ;
-       monthIndex== -1 ? ( sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue(  'Previous UUID Missing!' ),console.error("Previous UUID MISSING"),fail ):( ss.getSheetByName(monthsheet).deleteRow(monthIndex+1), console.log('deleted previous data'));
-  
-    } //end for loop
-
-    } //end when Json is nonEmpty
-
-};  //end function delPreJS
+    //detect if any JSON
+        //sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).getValue( ) == '';
     
+    // get all monthlysheet
+      //regex get all month sheet name, for 'of' loop find index and delete
+      //find out uuid and delete
+        //rowno = findIndex method + 1
+        //delete row 
+          //  ss.getSheetByName(key).deleteRow(rowno)
+
+      //if cannot find, leave tag, fail
+        //  sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue(  'Previous UUID Missing!' );
+
+
+
+  delPreJS = (fdrow, fd) => {
+      if ( sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).getValue( ) !== '' ){
+        
+        var allMonthlySheet = dtb.cdup(       //get month sheet
+              Object.entries( fd ).reduce( (acc,cur,i) =>
+                RegExp(mth).test(cur[0])? acc.concat( cur[1]):acc
+                    ,[]));
+
+                console.warn( allMonthlySheet); //consolelog checking
+                //console.warn( JSON.parse(sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).getValue( ))[id] ); //consolelog checking
+
+      for ( monthsheet of allMonthlySheet ){   //for loop. delete row or return 'fail' if cannot find
+        var  monthIndex =  msdata(monthsheet).map(  x=> 
+                {
+                
+                //console.warn(msheader(monthsheet) ); //consolelog checking
+                //console.warn( hIdxArr(id,msheader(monthsheet))   ); //consolelog checking
+                //console.warn( x[hIdxArr(id,msheader(monthsheet) )]  ); //consolelog checking
+                
+                return  x[hIdxArr(id,msheader(monthsheet) )] 
+                }
+                )
+              .findIndex( i => i ==  JSON.parse(sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).getValue( ))[id] ) ;//previous JSON uuid
+        
+               console.warn( monthIndex); //consolelog checking
+
+        monthIndex== -1 ? ( sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue(  'Previous UUID Missing!' ),console.error("Previous UUID MISSING"),fail ):( ss.getSheetByName(monthsheet).deleteRow(monthIndex+1), console.log('deleted previous data'));
+    
+      } //end for loop
+
+      } //end when Json is nonEmpty
+
+  };  //end function delPreJS
+//End Delete Previous data    
     
 
+//  JSON.parse(sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).getValue( ))[id]  //previous JS id
 
   
+//Return JSON 
+writeJS = (fdrow, fd) => sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).setValue( JSON.stringify( fd )   );
+
+
 
 
 /** 
@@ -502,7 +531,7 @@ let flt = 'flat';
 let mth = 'monthlySheet';  //month sheet involved
 let d1 = 'Date of Application';
 let d2 = 'Date of Application (Option 2)';
-let fdrow = 46;
+let fdrow = 45;
 let emel = 'Email address';
 let clr = 'color';
 var prRow = '';
@@ -528,17 +557,17 @@ var fd = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(response_sheetName
 
 function sub() {
 
-console.log(fd)
+  console.log(fd)
+
 detSPR(fdrow);
 swap( fd,d1,d2 ) // swap doA 1st and 2nd if 1st is blank
 detblk(fdrow);  // detect if both are blank
+detDobj(fdrow); //detect if date is in string format
 detInvD(fdrow);
 detDupSub(fdrow);
 fd = fd2obj(fd);
 
   console.log(fd);
-
-
 
 
 //split dates, clear duplicate w/in AL type, convert to time str
@@ -558,7 +587,6 @@ try {
 }
 
 
-
   console.log(fd);
 
 
@@ -566,29 +594,21 @@ detCrash(fdrow);
 flatd1d2();
 detSub();
 detCmt(fd);
-
 guuid(fd);
 colorpencil(fd);
 
-
-// console.log(fd.uuid);
   console.log(fd);
 
+delPreJS(fdrow, fd);
+plotInfo(fd);
+writeJS(fdrow, fd);
 
-plotInfo (fd);
-
-console.log(fd);
-
-//console.log(  dtb.dmonth(fd['Date of Application']['Full'][0])  ) //get month
-// writeJS(fd);
+  console.log(fd);
 
 
 
    
 }
-
-
-
 
 
 
