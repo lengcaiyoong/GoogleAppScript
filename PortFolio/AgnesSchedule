@@ -556,7 +556,6 @@ try{
 
 
 
-
 /** 
  * Declare Variable
  */
@@ -606,7 +605,6 @@ var sheet, fdrow, prRow , fd  ;
       //var response_sheetName = 'Form Response 8'
       //var sheet = ss.getSheetByName(response_sheetName);
       //let headers = ss.getSheetByName(response_sheetName).getRange("1:1").getValues()[0];  //headers
-
 
 
 
@@ -668,12 +666,9 @@ function sub(event) {
   writeJS();
       // console.log(fd ,  Object.keys(fd).length);  
   
+      console.log(`done plotting row ${fdrow}`);
+
 }
-
-
-
-
-
 
 
 getfdrow = (arrfdrow) => {      //fn to get list of fdrows
@@ -714,15 +709,15 @@ function manual() {
   sheet = ss.getSheetByName(response_sheetName);
   headers = ss.getSheetByName(response_sheetName).getRange("1:1").getValues()[0];  //headers
 
-  console.log(tfdrow); //consolelog checking
-  console.log(arrfdrow); //consolelog checking
-  console.log(getfdrow(arrfdrow)); //consolelog checking
+  //console.log(tfdrow); //consolelog checking
+  //console.log(arrfdrow); //consolelog checking
+  //console.log(getfdrow(arrfdrow)); //consolelog checking
 
 
 //Start For loop
   for ( i of  getfdrow(arrfdrow) )  {    //start for loop
 
-    console.warn(i); //consolelog checking
+    console.warn(`Proceed to row ${i}`); //consolelog checking
 
 
     //Define form data
@@ -752,7 +747,7 @@ function manual() {
             // console.log(fd ,  Object.keys(fd).length);  
         writeJS();
             // console.log(fd ,  Object.keys(fd).length);  
-      
+            console.log(`done plotting row ${fdrow}`);
       }catch(error){
         console.log(`Row ${fdrow} is skipped`)
         continue;
