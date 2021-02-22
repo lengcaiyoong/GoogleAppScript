@@ -60,6 +60,11 @@ try {
   msdata = (sheetnamee) => ss.getSheetByName(sheetnamee).getDataRange().getValues();  //monthly sheet
 
 
+//Get Monthly SHeet data Header
+msheader = (mssheet) => SpreadsheetApp.getActiveSpreadsheet().getSheetByName(mssheet).getRange("1:1").getValues()[0];  //monthly sheet header
+
+
+
 //Get Timestamp col index
   msheader = (mssheet) => SpreadsheetApp.getActiveSpreadsheet().getSheetByName(mssheet).getRange("1:1").getValues()[0];  //monthly sheet header
 
@@ -131,7 +136,7 @@ let hIdxArr = (hname,headersData) =>  headersData.indexOf(hname); //Header index
  */
 
 //Special remark detection
-   let detSPR = (fdrow) => fd[hIdxArr(rmk,headers)] !== ''?(sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Special Remark"), console.error(`<<ERROR>>:\n\nSpecial Remark at row ${fdrow}`),fail):'';
+   let detSPR = (fd, fdrow) => fd[hIdxArr(rmk,headers)] !== ''?(sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Special Remark"), console.error(`<<ERROR>>:\n\nSpecial Remark at row ${fdrow}`),fail):'';
 
 
 
@@ -147,7 +152,7 @@ let hIdxArr = (hname,headersData) =>  headersData.indexOf(hname); //Header index
 
 
 //Invalid Date Format (Only Date String Allowed)
-let detDobj = (fdrow) => headers.map( (h,i) => RegExp(dot).test(h)?
+let detDobj = (fd,fdrow) => headers.map( (h,i) => RegExp(dot).test(h)?
   (
     typeof fd[i] !== 'object'? '': 
   (sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Invalid Format"), 
@@ -555,12 +560,11 @@ try{
  * Declare Variable
  */
 
-
+//Spreadsheet Variable
 let ss = SpreadsheetApp.getActiveSpreadsheet();
-let ui = SpreadsheetApp.getUi();
-let response_sheetName = "Form responses 8";
+var response_sheetName = '';
 
-var sheet = ss.getSheetByName(response_sheetName);
+
 
 //variable list
 let js = 'JSON';
@@ -574,10 +578,8 @@ let flt = 'flat';
 let mth = 'monthlySheet';  //month sheet involved
 let d1 = 'Date of Application';
 let d2 = 'Date of Application (Option 2)';
-let fdrow = 45;
 let emel = 'Email address';
 let clr = 'color';
-var prRow = '';
 let cmt = 'Comment';
 let reDOA1 = "\\b"+dot+"(?!\\s\\(Option 2\\))";
 let reDOA2 = "\\b"+dot+"(?=\\s\\(Option 2\\))";
@@ -586,36 +588,72 @@ let reDOA2 = "\\b"+dot+"(?=\\s\\(Option 2\\))";
     //white '#ffffff'
   let colors =  [ '#ffff00', '#0000ff',  '#00ff00',  '#e69138', '#ff0000', '#9900ff', '#00ffff' ];
 
+//Get Headers
+let headers = '';
+
+
+//Changeable variable
+var sheet = '';
+var fdrow = '';
+var prRow = '';
+
+
+
 //Stop exe = fail
 
-//Get Data
-let headers = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(response_sheetName).getRange("1:1").getValues()[0];  //headers
 
-msheader = (mssheet) => SpreadsheetApp.getActiveSpreadsheet().getSheetByName(mssheet).getRange("1:1").getValues()[0];  //monthly sheet header
-
-var fd = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(response_sheetName).getRange(eval("`${fdrow}:${fdrow}`")).getValues()[0]; //form data
-
-
+//Variable which has to be Redefined
+  //fdrow, sheet, prRow, response_sheetName, headers
+      //var response_sheetName = 'Form Response 8'
+      //var sheet = ss.getSheetByName(response_sheetName);
+      //let headers = ss.getSheetByName(response_sheetName).getRange("1:1").getValues()[0];  //headers
 
 
-function sub() {
 
-      console.log(fd)
 
-  detSPR(fdrow);
+
+
+function sub(event) {
+
+//event
+
+//Trigger Variable
+  response_sheetName = event.source.getActiveSheet().getSheetName();
+  var range = event.range;
+  var erow = range.getRow();
+  var ecol = range.getLastColumn();
+
+    console.log(range); //consolelog checking
+    console.log([response_sheetName,erow,ecol]);  //consolelog checking
+
+  
+//Redefined Global Variables 
+  fdrow = erow;     //remember change to erow
+  sheet = ss.getSheetByName(response_sheetName);
+  headers = ss.getSheetByName(response_sheetName).getRange("1:1").getValues()[0];  //headers
+
+
+  
+//Define form data
+  var fd = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(response_sheetName).getRange(eval("`${fdrow}:${fdrow}`")).getValues()[0]; //form data
+
+
+      // console.log(fd)
+
+  detSPR(fd, fdrow);
   swap( fd,d1,d2 ) // swap doA 1st and 2nd if 1st is blank
   detblk(fd, fdrow);  // detect if both are blank
-  detDobj(fdrow); //detect if date is in string format
+  detDobj(fd, fdrow); //detect if date is in string format
   detInvD(fd, fdrow);
   detDupSub(fd, fdrow);
 
   fd = fd2obj(fd);  //fd convert to object
 
-      console.log(fd);
+      // console.log(fd);
 
   dateClean(fdrow, fd) // split date, clear dup and convert to getTime()
 
-      console.log(fd);
+      // console.log(fd);
 
   detCrash(fdrow, fd);
   flatd1d2(fd);
@@ -632,7 +670,7 @@ function sub() {
       // console.log(fd ,  Object.keys(fd).length);
   
   writeJS(fdrow, fd);
-      console.log(fd ,  Object.keys(fd).length);  
+      // console.log(fd ,  Object.keys(fd).length);  
   
 }
 
