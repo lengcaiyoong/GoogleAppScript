@@ -556,6 +556,9 @@ try{
 
 
 
+
+
+
 /** 
  * Declare Variable
  */
@@ -605,6 +608,9 @@ var sheet, fdrow, prRow , fd  ;
       //var response_sheetName = 'Form Response 8'
       //var sheet = ss.getSheetByName(response_sheetName);
       //let headers = ss.getSheetByName(response_sheetName).getRange("1:1").getValues()[0];  //headers
+
+
+
 
 
 
@@ -759,3 +765,33 @@ function manual() {
 };            
 
 
+
+
+
+function editing(editsth) {
+  
+  //isblank is pValue == undefined 
+
+
+  // Set a comment on the edited cell to indicate when it was changed.
+  var spreadsheet = editsth.source.getActiveSheet().getSheetName();
+  var range = editsth.range;
+  var ecol = range.getColumn();
+  var erow = range.getRow();
+  var pValue = editsth.oldValue;
+  var nValue = editsth.value;
+  
+  console.log([spreadsheet,ecol,erow]);
+  // console.log([spreadsheet,ecol,erow,range.getValue()]);
+  // console.log([spreadsheet,ecol,erow,range.getValues()]);
+  console.log(range);
+  console.warn( pValue, nValue );
+  console.log( pValue == undefined , nValue == undefined);
+
+  // console.log(nValue);
+//  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("testing trigger").getRange("A16:D16").setValue(nValue[0]);
+  // SpreadsheetApp.getUi().alert('you changed sth');
+
+
+  
+}
