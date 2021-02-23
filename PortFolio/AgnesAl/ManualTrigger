@@ -16,6 +16,14 @@ getfdrow = (arrfdrow) => {      //fn to get list of fdrows
 };  
 
 
+function customManualMenu(){
+    SpreadsheetApp.getUi().createMenu('Custom Menu')
+      .addItem('Manual Trigger', 'manual')
+      .addToUi();
+}
+
+
+
 function manual() {
 
   let ui = SpreadsheetApp.getUi();
