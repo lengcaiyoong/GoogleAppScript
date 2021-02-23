@@ -2,7 +2,11 @@ function linkForm() {
 
 //Link Form to Spreadsheet
   //if googleForm linked a spreadsheet file previously, it will automatically delete it and link the latest spreadsheet
-  
+  //get form response sheet
+      // SpreadsheetApp.getActiveSpreadsheet().getSheets().filter(
+      //       x => /Form responses/i.test(x.getSheetName())
+      //             )[0]
+
 
 let formid = SpreadsheetApp.getUi().prompt( 'Enter Google Form URL' );
 
@@ -12,7 +16,7 @@ formid.getSelectedButton() == SpreadsheetApp.getUi().Button.CLOSE?fail:'';
 let form = FormApp.openByUrl(formid.getResponseText());
 
 
- //form.removeDestination();  //remove previous form
+//  form.removeDestination();  //remove previous form
 
 try{
   typeof form.getDestinationId() == 'string'  //if return error means GoogleForm hasn't linked anything
@@ -23,17 +27,34 @@ try{
     
   form.setDestination(FormApp.DestinationType.SPREADSHEET, SpreadsheetApp.getActiveSpreadsheet().getId() ) //link google form
 
-  setCF4mainsheet(
-    SpreadsheetApp.getActiveSpreadsheet().getSheets().filter(
+  //add extra column at Form Response Sheet
+  var respColHeader = 
+        SpreadsheetApp.getActiveSpreadsheet()
+            .getSheets()
+            .filter( x => /Form responses/i.test(x.getSheetName()))[0]
+            .getRange("1:1")
+            .getValues()[0]
+            .filter( x=> x !== '').concat( extColHeader );
+
+SpreadsheetApp.getActiveSpreadsheet().getSheets().filter(
         x => /Form responses/i.test(x.getSheetName())
-              )[0].getSheetName()
-              )  //set conditional formatting on mainsheet
+              )[0].getRange(1,1,1,
+                respColHeader.length).setValues(  [respColHeader] );
+
+  headers =  SpreadsheetApp.getActiveSpreadsheet().getSheets()
+            .filter( x => /Form responses/i.test(x.getSheetName()))[0].getRange("1:1").getValues()[0].filter( x=> x !== '');
+
+  // setCF4mainsheet(
+  //   SpreadsheetApp.getActiveSpreadsheet().getSheets().filter(
+  //       x => /Form responses/i.test(x.getSheetName())
+  //             )[0].getSheetName()
+  //             )  //set conditional formatting on mainsheet
 
   SpreadsheetApp.getUi().alert( 'DONE Linked To Spreadsheet' )
 
   monthTemplate(); //Create Monthly Tab
 
-  installTriggers(); //Install 2 Triggers
+  installTriggers(); //Install 3 Triggers
 
    
    SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Button').hideSheet();  //Hide Button Sheet
