@@ -13,14 +13,14 @@ let js = 'JSON';
 let tstmp = 'Timestamp';
 let id = 'UUID';
 let full = 'Full';
-let rmk = 'Remarks (if neccessary otherwise ignore)';
+let rmk = 'Remarks (Leave Blank Unless REQUIRED)';
 let tg = 'Tag';
 let dot = 'Date of Application';
 let flt = 'flat';
 let mth = 'monthlySheet';  //month sheet involved
 let d1 = 'Date of Application';
 let d2 = 'Date of Application (Option 2)';
-let emel = 'Email address';
+let emel = 'Email Address';
 let clr = 'color';
 let cmt = 'Comment';
 let reDOA1 = "\\b"+dot+"(?!\\s\\(Option 2\\))";
@@ -57,4 +57,32 @@ var sheet, fdrow, prRow , fd  ;
       //var response_sheetName = 'Form Response 8'
       //var sheet = ss.getSheetByName(response_sheetName);
       //let headers = ss.getSheetByName(response_sheetName).getRange("1:1").getValues()[0];  //headers
+
+
+
+//Template Spreadsheet Variables
+
+  //Form Response Extra Col.
+    let extColHeader = [ 'Tag','JSON'];
+
+  //Monthly Sheet Column Header
+
+    let columnheader =  ['Comment',
+        'UUID',
+        'Timestamp',
+        'LOB',
+        'Full Name',
+        'Email address'];
+
+//Conditonal Format Variables
+let tagAndP2W = 'A2:F';
+  let basicInfo = '$A2:$D2';
+  let tagcol    = '$H2';
+  let jscol     = '$I2';
+  
+
+let duplicateEmail = '$F$2:$F,$F2';
+
+
+
 
