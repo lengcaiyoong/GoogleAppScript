@@ -1,0 +1,46 @@
+//Define Event Pair
+
+//// Define Event pair
+  var eventPair = [  
+    
+    ["editing", ScriptApp.EventType.ON_EDIT], 
+    
+    ["sub", ScriptApp.EventType.ON_FORM_SUBMIT]  
+    
+    ]
+
+
+
+function installTriggers() {
+  let triggers = ScriptApp.getProjectTriggers(); 
+
+
+//// Find which Event Pair Havent Installed
+triggers.forEach( i => {
+  eventPair.forEach( (c,ind) =>{
+      if(i.getHandlerFunction() ==c[0] && i.getEventType() == c[1]){  
+      eventPair.splice(ind,1); 
+          }
+                    }
+  )
+        // console.log(eventPair); //debug purpose
+}
+)
+        // console.log(eventPair.length>0); //Debug Purpose
+  
+//// Install Different Event Types with respective eventFn given
+if( eventPair.length>0) { 
+eventPair.forEach( 
+      event =>{ switch(event[1]){
+  case ScriptApp.EventType.ON_EDIT: 
+          ScriptApp.newTrigger(event[0]).forSpreadsheet(SpreadsheetApp.getActive()).onEdit().create();break;
+  case ScriptApp.EventType.ON_CHANGE: 
+          ScriptApp.newTrigger(event[0]).forSpreadsheet(SpreadsheetApp.getActive()).onChange().create();break;
+  case ScriptApp.EventType.ON_FORM_SUBMIT: 
+          ScriptApp.newTrigger(event[0]).forSpreadsheet(SpreadsheetApp.getActive()).onFormSubmit().create();break;
+  case ScriptApp.EventType.ON_OPEN: 
+          ScriptApp.newTrigger(event[0]).forSpreadsheet(SpreadsheetApp.getActive()).onOpen().create();break;
+}}); 
+} 
+   };
+
