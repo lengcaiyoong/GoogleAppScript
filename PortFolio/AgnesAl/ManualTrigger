@@ -1,0 +1,88 @@
+getfdrow = (arrfdrow) => {      //fn to get list of fdrows
+ if(  arrfdrow.length ==1 ){
+         return arrfdrow;
+       }else{ 
+         return Array.from(
+            {length: 
+                (Math.abs( arrfdrow[0] - arrfdrow[1] ) + 1)
+              }, 
+            function(){
+              return this.start*1 + (this.factor++)
+              }, 
+            { start: arrfdrow.sort( (a,b) =>  a-b )[0],
+              factor: 0,
+              });
+              };
+};  
+
+
+function manual() {
+
+  let ui = SpreadsheetApp.getUi();
+  response_sheetName = ss.getActiveSheet().getSheetName();
+
+  
+//Redefined Global Variables 
+  var input_fdrow = ui.prompt('Kindly Insert the Row notation \n\n eg. 1:1 or 1:5 or 2:7');
+
+//Validate input of row
+  /^([2-9]|[1-9]\d+):[1-9]\d*$/.test(input_fdrow.getResponseText())?fdrow = input_fdrow.getResponseText():(ui.alert('Please Enter Valid Row')  , stop);
+  
+//Define variables for Fn of getfdrow
+  var tfdrow = input_fdrow.getResponseText();
+  var arrfdrow = dtb.cdup(tfdrow.split(':')); //Array of Splited and cleared duplicates from inputPrompt
+
+//Redefine Headers and sheet
+  sheet = ss.getSheetByName(response_sheetName);
+  headers = ss.getSheetByName(response_sheetName).getRange("1:1").getValues()[0];  //headers
+
+  //console.log(tfdrow); //consolelog checking
+  //console.log(arrfdrow); //consolelog checking
+  //console.log(getfdrow(arrfdrow)); //consolelog checking
+
+
+//Start For loop
+  for ( i of  getfdrow(arrfdrow) )  {    //start for loop
+
+    console.warn(`Proceed to row ${i}`); //consolelog checking
+
+
+    //Define form data
+      fdrow = i;
+      fd = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(response_sheetName).getRange(eval("`${fdrow}:${fdrow}`")).getValues()[0]; //form data
+
+  try{        //try to run codes, if fail will catch error
+        detSPR();
+        swap() // swap doA 1st and 2nd if 1st is blank
+        detblk();  // detect if both are blank
+        detDobj(); //detect if date is in string format
+        detInvD();
+        detDupSub();
+        fd = fd2obj();  //fd convert to object
+            // console.log(fd);
+        dateClean() // split date, clear dup and convert to getTime()
+            // console.log(fd);
+        detCrash();
+        flatd1d2();
+        detSub();
+        detCmt();
+        guuid();
+        colorpencil();
+        delPreJS();
+            // console.warn(fd,  Object.keys(fd).length );
+        plotInfo();
+            // console.log(fd ,  Object.keys(fd).length);  
+        writeJS();
+            // console.log(fd ,  Object.keys(fd).length);  
+            console.log(`done plotting row ${fdrow}`);
+      }catch(error){
+        console.log(`Row ${fdrow} is skipped`)
+        continue;
+         }   //end catch
+            
+            
+  } //end for loop
+
+};            
+
+
