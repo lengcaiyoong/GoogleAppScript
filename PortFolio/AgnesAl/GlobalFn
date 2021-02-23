@@ -109,7 +109,7 @@ let fdobj = headers.reduce( (acc, cur, i) => { acc[cur] = fd[i];return acc} ,{})
  monthlist = (m,y, d=1) => {     //by default d=1
         return Array.from(
           {   length:    
-            new Date( new Date( `${m+2}-${d}-2021 UTC+8`) -1 ).toLocaleDateString( 'default' ,{day: 'numeric', timeZone: 'Asia/Singapore'})   // Get Days of Last Day in month in UTC+8 
+            new Date( new Date( `${m+2 >12?1:m+2}-${d}-${m+2>12?y+1:y} UTC+8`) -1 ).toLocaleDateString( 'default' ,{day: 'numeric', timeZone: 'Asia/Singapore'})   // Get Days of Last Day in month in UTC+8 
               },  // End
           
           function(){   //add 24 hours for each loop
