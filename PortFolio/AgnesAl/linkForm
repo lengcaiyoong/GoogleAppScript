@@ -12,7 +12,7 @@ formid.getSelectedButton() == SpreadsheetApp.getUi().Button.CLOSE?fail:'';
 let form = FormApp.openByUrl(formid.getResponseText());
 
 
- form.removeDestination();  //remove previous form
+ //form.removeDestination();  //remove previous form
 
 try{
   typeof form.getDestinationId() == 'string'  //if return error means GoogleForm hasn't linked anything
