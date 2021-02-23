@@ -137,7 +137,7 @@ let hIdxArr = (hname,headersData) =>  headersData.indexOf(hname); //Header index
  */
 
 //Special remark detection
-   let detSPR = () => fd[hIdxArr(rmk,headers)] !== ''?(sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Special Remark"), console.error(`<<ERROR>>:\n\nSpecial Remark at row ${fdrow}`),fail):'';
+   let detSPR = () => fd[hIdxArr(rmk,headers)] !== ''?(sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(srmk), console.error(`<<ERROR>>:\n\n${srmk} at row ${fdrow}`),fail):'';
 
 
 
@@ -146,7 +146,7 @@ let hIdxArr = (hname,headersData) =>  headersData.indexOf(hname); //Header index
     RegExp(dot).test(cur)?
       acc.concat([fd[ind]]):acc,[])
         .filter(x => x !=='').length == 0?
-          (console.error(`<<ERROR>>\n\n Blank Dates at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Blank Dates"),fail)
+          (console.error(`<<ERROR>>\n\n ${blkd} at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(blkd),fail)
             :'';
 //End Here
 
@@ -156,7 +156,7 @@ let hIdxArr = (hname,headersData) =>  headersData.indexOf(hname); //Header index
 let detDobj = () => headers.map( (h,i) => RegExp(dot).test(h)?
   (
     typeof fd[i] !== 'object'? '': 
-  (sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Invalid Format"), 
+  (sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(invfor), 
     console.error(`<<ERROR>>:\n\nDate not in Text Format at row ${fdrow}`),
     fail))
     :'');
@@ -176,10 +176,10 @@ fd[hIdxArr( d1, headers )] == ''?
 
 //Invalid date detection
   let detInvD = () => headers.map( (h,i) => RegExp(dot).test(h)? (fd[i] == ''?'':
-    fd[i].match(/(\d?\d\s+\w{3}\s+\d{4})/ig)==null?(sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Invalid Date"),console.error(`Invalid date in data at row ${fdrow}`),fail):
+    fd[i].match(/(\d?\d\s+\w{3}\s+\d{4})/ig)==null?(sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(invdat),console.error(`${invdat} in data at row ${fdrow}`),fail):
     
     (  fd[i].match(/(\d?\d\s+\w{3}\s+\d{4})/ig).forEach(  d => 
-      (vdCheck(d) == false)? (console.error(`<<ERROR>>\n\nInvalid Date Found at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Invalid Date"),fail):''
+      (vdCheck(d) == false)? (console.error(`<<ERROR>>\n\n${invdat} Found at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(invdat),fail):''
                                                     ))
 
     ):''
@@ -187,15 +187,19 @@ fd[hIdxArr( d1, headers )] == ''?
 //
 
 
+//Edit Here
+
 //Duplicate Submit
-  let detDupSub = () => sheet.getRange(2,1,fdrow-2,headers.length).getValues().filter(
+  let detDupSub = () => sheet.getDataRange().getValues().filter(
     x => 
     x[hIdxArr(emel,headers)] == fd[hIdxArr(emel,headers)] && 
     x[hIdxArr(d1,headers)] == fd[hIdxArr(d1,headers)] && 
     x[hIdxArr(d2,headers)] == fd[hIdxArr(d2,headers)] 
-  ).length > 0? (console.error(`<<ERROR>>\n\n Agent submitted duplicate data before!`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Duplicate Submit"),fail):'';
+  ).length > 1? (console.error(`<<ERROR>>\n\n Agent submitted duplicate data before!`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(dupsubdat),fail):'';
 //
 
+
+//Edit Here
 
 //Date crash Detection
   //flatten object into array
@@ -205,7 +209,7 @@ let detCrash = () => headers.map( (h,i) =>
       var allALTYPE =   Object.entries(fd[h]).reduce( (acc, cur, ind) =>  
       acc.concat(...cur[1]),[]);
       allALTYPE.filter(x => x !== '').length == dtb.cdup(  allALTYPE  ).filter(x => x !== '').length?'':
-    (console.error(`<<ERROR>>\n\nDate Crash at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Date Crash"),fail)}});
+    (console.error(`<<ERROR>>\n\n${dcrash} at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(dcrash),fail)}});
 //
 
 
@@ -506,6 +510,8 @@ let flatd1d2 = () => headers.map( (h,i) =>
     
       } //end for loop
 
+      sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).setValue(''); // delete previos JSON once delete dashboard item
+
       } //end when Json is nonEmpty
 
   };  //end function delPreJS
@@ -556,9 +562,6 @@ try{
 
 
 
-
-
-
 /** 
  * Declare Variable
  */
@@ -586,6 +589,16 @@ let clr = 'color';
 let cmt = 'Comment';
 let reDOA1 = "\\b"+dot+"(?!\\s\\(Option 2\\))";
 let reDOA2 = "\\b"+dot+"(?=\\s\\(Option 2\\))";
+
+//Tag
+let srmk = 'Special Remark';
+let blkd = 'Blank Dates';
+let invfor = 'Invalid Format';
+let invdat = 'Invalid Date';
+let dupsubdat = 'Duplicate Submit';
+let dcrash = 'Date Crash';
+let tagarr = [blkd,invfor,invdat,dupsubdat,dcrash]; //not including special remark
+
 
 // color array
     //white '#ffffff'
@@ -675,6 +688,7 @@ function sub(event) {
       console.log(`done plotting row ${fdrow}`);
 
 }
+
 
 
 getfdrow = (arrfdrow) => {      //fn to get list of fdrows
@@ -768,29 +782,146 @@ function manual() {
 
 
 
-function editing(editsth) {
+
+ function editing(ie) {
   
   //isblank is pValue == undefined 
 
+  //Set up ui
+  let ui = SpreadsheetApp.getUi();
 
-  // Set a comment on the edited cell to indicate when it was changed.
-  var spreadsheet = editsth.source.getActiveSheet().getSheetName();
-  var range = editsth.range;
+  //Set a comment on the edited cell to indicate when it was changed
+  response_sheetName = ie.source.getActiveSheet().getSheetName();
+  var range = ie.range;
   var ecol = range.getColumn();
   var erow = range.getRow();
-  var pValue = editsth.oldValue;
-  var nValue = editsth.value;
+  var pValue = ie.oldValue;
+  var nValue = ie.value;
   
-  console.log([spreadsheet,ecol,erow]);
-  // console.log([spreadsheet,ecol,erow,range.getValue()]);
-  // console.log([spreadsheet,ecol,erow,range.getValues()]);
-  console.log(range);
-  console.warn( pValue, nValue );
-  console.log( pValue == undefined , nValue == undefined);
 
-  // console.log(nValue);
-//  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("testing trigger").getRange("A16:D16").setValue(nValue[0]);
-  // SpreadsheetApp.getUi().alert('you changed sth');
+    // console.log(range); //consolelog checking
+    // console.log([response_sheetName,erow,ecol]);  //consolelog checking
+    // console.log( pValue, nValue ); //consolelog checking
+
+  
+//Redefined Global Variables 
+  fdrow = erow;     //remember change to erow
+  sheet = ss.getSheetByName(response_sheetName);
+  headers = ss.getSheetByName(response_sheetName).getRange("1:1").getValues()[0];  //headers
+
+
+//Define form data
+  fd = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(response_sheetName).getRange(eval("`${fdrow}:${fdrow}`")).getValues()[0]; //form data
+
+
+//Detect if wanna trigger
+  //fd[hIdxArr(tg, headers)]  //Tag Item from fd array
+  
+
+
+//Del-Row Tag
+
+  if( /\b^delete$\b/i.test(fd[hIdxArr(tg, headers)])){   //Start Tag Detection
+
+        var delalert =  ui.alert('Are you sure u wanna delete this row?', ui.ButtonSet.YES_NO);    //dialog box prompt
+        
+        if(delalert == ui.Button.YES){   //Choose Yes
+            
+            console.log('Start Executing \'delete row\'~ Please wait...')
+              delPreJS(); 
+              sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue('ROWDELETED'); //return deleted tag at tag col.
+              console.log('Done Delete Execution');
+               return        //Stop from Running Plotting
+
+           }else{
+            sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue('')
+            console.warn('del-row fn cancelled') //consolelog checking
+            return  }      //stop exe if not choosing yes
+                            //Del-Row Tag End
+
+
+//Special Remark
+
+      }else if( pValue == srmk && /^[-－]$/i.test(nValue) && fd[hIdxArr(js, headers)] == '' ){  
+
+
+
+          var rmkalert = ui.alert('Have you fulfilled the requirement from remark?', ui.ButtonSet.YES_NO);    //dialog box prompt
+          
+     if(rmkalert == ui.Button.YES){   //Choose Yes
+            console.log("Start Executing \'Remarks\'~ Please wait...")
+            sheet.getRange(fdrow , hIdxS(rmk,headers) ,1,1 ).setNote(fd[hIdxArr(rmk,  headers)])            //set Notes
+             sheet.getRange(fdrow , hIdxS(rmk,headers) ,1,1 ).setValue('')                  //del remark
+             sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue('')                   //del tag
+             console.warn('Proceed to Plotting') //consolelog checking
+                
+           }else{
+                 sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue(srmk);
+                 console.warn('Remark fn cancelled') //consolelog checking
+                 return  }    //stop exe if not choosing yes
+    //                           // Special Remark End
+
+
+//Other Tags
+      }else if ( (tagarr.findIndex( x => pValue == x ) !== -1) && /^[-－]$/i.test(nValue) && fd[hIdxArr(js, headers)] == ''){
+
+        console.log("Start Executing ~ Please wait...");
+        sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue('');                   //del tag
+
+
+
+//Other Tags
+
+
+//No Tag
+    }else{
+            //  console.warn(pValue, nValue); //consolelog checking
+            //  console.warn(fd[hIdxArr(js, headers)]); //consolelog checking
+            //  console.warn('no Tag found') //consolelog checking  
+      return 
+    }; //No Tag End
+       //End Tag Detection
+    
+
+  console.warn('Start plotting')
+
+
+   // console.log(fd)
+
+  detSPR();
+  swap() // swap doA 1st and 2nd if 1st is blank
+  detblk();  // detect if both are blank
+  detDobj(); //detect if date is in string format
+  detInvD();
+  detDupSub();
+
+  fd = fd2obj();  //fd convert to object
+
+      // console.log(fd);
+
+  dateClean() // split date, clear dup and convert to getTime()
+
+      // console.log(fd);
+
+  detCrash();
+  flatd1d2();
+  detSub();
+  detCmt();
+  guuid();
+  colorpencil();
+
+
+  delPreJS();
+      // console.warn(fd,  Object.keys(fd).length );
+
+  plotInfo();
+      // console.log(fd ,  Object.keys(fd).length);
+  
+  writeJS();
+      // console.log(fd ,  Object.keys(fd).length);  
+  
+      console.log(`done plotting row ${fdrow}`);
+
 
 
   
