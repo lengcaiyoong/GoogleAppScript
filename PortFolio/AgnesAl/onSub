@@ -1,0 +1,61 @@
+function sub(event) {
+
+//event
+
+//Trigger Variable
+  response_sheetName = event.source.getActiveSheet().getSheetName();
+  var range = event.range;
+  var erow = range.getRow();
+  var ecol = range.getLastColumn();
+
+    console.log(range); //consolelog checking
+    console.log([response_sheetName,erow,ecol]);  //consolelog checking
+
+  
+//Redefined Global Variables 
+  fdrow = erow;     //remember change to erow
+  sheet = ss.getSheetByName(response_sheetName);
+  headers = ss.getSheetByName(response_sheetName).getRange("1:1").getValues()[0];  //headers
+
+
+//Define form data
+ fd = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(response_sheetName).getRange(eval("`${fdrow}:${fdrow}`")).getValues()[0]; //form data
+
+
+      // console.log(fd)
+
+  detSPR();
+  swap() // swap doA 1st and 2nd if 1st is blank
+  detblk();  // detect if both are blank
+  detDobj(); //detect if date is in string format
+  detInvD();
+  detDupSub();
+
+  fd = fd2obj();  //fd convert to object
+
+      // console.log(fd);
+
+  dateClean() // split date, clear dup and convert to getTime()
+
+      // console.log(fd);
+
+  detCrash();
+  flatd1d2();
+  detSub();
+  detCmt();
+  guuid();
+  colorpencil();
+
+
+  delPreJS();
+      // console.warn(fd,  Object.keys(fd).length );
+
+  plotInfo();
+      // console.log(fd ,  Object.keys(fd).length);
+  
+  writeJS();
+      // console.log(fd ,  Object.keys(fd).length);  
+  
+      console.log(`done plotting row ${fdrow}`);
+
+}
