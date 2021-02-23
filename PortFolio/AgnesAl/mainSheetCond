@@ -9,18 +9,21 @@ let sscond = SpreadsheetApp.newConditionalFormatRule();
 let formSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
 
 
+
+ 
 //(1) Pending to write
   let p2w = sscond
-        .setRanges([formSheet.getRange('A2:F')])
-        .whenFormulaSatisfied('=AND( AND(ArrayFormula(NOT(isblank($A2:$C2)))),isblank($I2))')
+        .setRanges([formSheet.getRange(tagAndP2W)])
+        .whenFormulaSatisfied(`=AND( AND(ArrayFormula(NOT(isblank(${basicInfo})))),isblank(${jscol}), NOT(${tagcol} = "ROWDELETED")
+        )`)
         .setBackground('#FFFF00')
         .build();
   
 
   //(2) Tag
   let tagissue = sscond
-        .setRanges([formSheet.getRange('A2:F')])
-        .whenFormulaSatisfied('=AND(  AND(ArrayFormula(NOT(isblank($A2:$C2)))), NOT(isblank($H2)), NOT($H2 = "ROWDELETED")  )')
+        .setRanges([formSheet.getRange(tagAndP2W)])
+        .whenFormulaSatisfied(`=AND(  AND(ArrayFormula(NOT(isblank(${basicInfo})))), NOT(isblank(${tagcol})), NOT(${tagcol} = "ROWDELETED")  )`)
         .setBackground('#FF0000')
         .build();
 
@@ -29,7 +32,7 @@ let formSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
 
 //Set Main sheet p2w and tagissue
   formSheet.setConditionalFormatRules( [
-      p2w, tagissue
+      tagissue, p2w
       ] );
 
 
