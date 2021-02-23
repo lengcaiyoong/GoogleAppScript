@@ -1,0 +1,60 @@
+/** 
+ * Declare Variable
+ */
+
+//Spreadsheet Variable
+let ss = SpreadsheetApp.getActiveSpreadsheet();
+var response_sheetName = '';
+
+
+
+//variable list
+let js = 'JSON';
+let tstmp = 'Timestamp';
+let id = 'UUID';
+let full = 'Full';
+let rmk = 'Remarks (if neccessary otherwise ignore)';
+let tg = 'Tag';
+let dot = 'Date of Application';
+let flt = 'flat';
+let mth = 'monthlySheet';  //month sheet involved
+let d1 = 'Date of Application';
+let d2 = 'Date of Application (Option 2)';
+let emel = 'Email address';
+let clr = 'color';
+let cmt = 'Comment';
+let reDOA1 = "\\b"+dot+"(?!\\s\\(Option 2\\))";
+let reDOA2 = "\\b"+dot+"(?=\\s\\(Option 2\\))";
+
+//Tag
+let srmk = 'Special Remark';
+let blkd = 'Blank Dates';
+let invfor = 'Invalid Format';
+let invdat = 'Invalid Date';
+let dupsubdat = 'Duplicate Submit';
+let dcrash = 'Date Crash';
+let tagarr = [blkd,invfor,invdat,dupsubdat,dcrash]; //not including special remark
+
+
+// color array
+    //white '#ffffff'
+  let colors =  [ '#ffff00', '#0000ff',  '#00ff00',  '#e69138', '#ff0000', '#9900ff', '#00ffff' ];
+
+//Get Headers
+let headers = '';
+
+
+//Changeable variable
+var sheet, fdrow, prRow , fd  ;
+
+
+//Stop exe = fail
+//Stop exe 2 = stop
+
+
+//Variable which has to be Redefined
+  //fdrow, sheet, prRow, response_sheetName, headers, fd
+      //var response_sheetName = 'Form Response 8'
+      //var sheet = ss.getSheetByName(response_sheetName);
+      //let headers = ss.getSheetByName(response_sheetName).getRange("1:1").getValues()[0];  //headers
+
