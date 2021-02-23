@@ -1,0 +1,144 @@
+ function editing(ie) {
+  
+  //isblank is pValue == undefined 
+  //For Special remark, have to delete fd special remark, coz detSPR detect special remark from fd
+  //but no further deletion in fd on other tags (inlcuding delete tag)
+
+
+  //Set up ui
+  let ui = SpreadsheetApp.getUi();
+
+  //Set a comment on the edited cell to indicate when it was changed
+  response_sheetName = ie.source.getActiveSheet().getSheetName();
+  var range = ie.range;
+  var ecol = range.getColumn();
+  var erow = range.getRow();
+  var pValue = ie.oldValue;
+  var nValue = ie.value;
+  
+
+    // console.log(range); //consolelog checking
+    // console.log([response_sheetName,erow,ecol]);  //consolelog checking
+    // console.log( pValue, nValue ); //consolelog checking
+
+  
+//Redefined Global Variables 
+  fdrow = erow;     //remember change to erow
+  sheet = ss.getSheetByName(response_sheetName);
+  headers = ss.getSheetByName(response_sheetName).getRange("1:1").getValues()[0];  //headers
+
+
+//Define form data
+  fd = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(response_sheetName).getRange(eval("`${fdrow}:${fdrow}`")).getValues()[0]; //form data
+
+
+//Detect if wanna trigger
+  //fd[hIdxArr(tg, headers)]  //Tag Item from fd array
+  
+
+
+//Del-Row Tag
+
+  if( /\b^delete$\b/i.test(fd[hIdxArr(tg, headers)])){   //Start Tag Detection
+
+        var delalert =  ui.alert('Are you sure u wanna delete this row?', ui.ButtonSet.YES_NO);    //dialog box prompt
+        
+        if(delalert == ui.Button.YES){   //Choose Yes
+            
+            console.log('Start Executing \'delete row\'~ Please wait...')
+              delPreJS(); 
+              sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue('ROWDELETED'); //return deleted tag at tag col.
+              console.log('Done Delete Execution');
+               return        //Stop from Running Plotting
+
+           }else{
+            sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue('')
+            console.warn('del-row fn cancelled') //consolelog checking
+            return  }      //stop exe if not choosing yes
+                            //Del-Row Tag End
+
+
+//Special Remark
+
+      }else if( pValue == srmk && /^[-－]$/i.test(nValue) && fd[hIdxArr(js, headers)] == '' ){  
+
+
+
+          var rmkalert = ui.alert('Have you fulfilled the requirement from remark?', ui.ButtonSet.YES_NO);    //dialog box prompt
+          
+     if(rmkalert == ui.Button.YES){   //Choose Yes
+            console.log("Start Executing \'Remarks\'~ Please wait...")
+            sheet.getRange(fdrow , hIdxS(rmk,headers) ,1,1 ).setNote(fd[hIdxArr(rmk,  headers)]);            //set Notes
+             sheet.getRange(fdrow , hIdxS(rmk,headers) ,1,1 ).setValue('');                  //del remark
+             sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue('');                   //del tag
+             fd[hIdxArr(rmk, headers)] = '' ;  // delete remark in fd
+             console.warn('Proceed to Plotting') //consolelog checking
+
+
+                
+           }else{
+                 sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue(srmk);
+                 console.warn('Remark fn cancelled') //consolelog checking
+                 return  }    //stop exe if not choosing yes
+    //                           // Special Remark End
+
+
+//Other Tags
+      }else if ( (tagarr.findIndex( x => pValue == x ) !== -1) && /^[-－]$/i.test(nValue) && fd[hIdxArr(js, headers)] == ''){
+
+        console.log("Start Executing ~ Please wait...");
+        sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue(''); //del tag
+        
+//Other Tags End                  
+    }else{      //No Tag Found
+            //  console.warn(pValue, nValue); //consolelog checking
+            //  console.warn(fd[hIdxArr(js, headers)]); //consolelog checking
+            //  console.warn('no Tag found') //consolelog checking  
+      return 
+    }; //No Tag End
+       //End Tag Detection
+    
+
+  console.warn('Start plotting')
+
+
+   // console.log(fd)
+
+  detSPR();
+  swap() // swap doA 1st and 2nd if 1st is blank
+  detblk();  // detect if both are blank
+  detDobj(); //detect if date is in string format
+  detInvD();
+  detDupSub();
+
+  fd = fd2obj();  //fd convert to object
+
+      // console.log(fd);
+
+  dateClean() // split date, clear dup and convert to getTime()
+
+      // console.log(fd);
+
+  detCrash();
+  flatd1d2();
+  detSub();
+  detCmt();
+  guuid();
+  colorpencil();
+
+
+  delPreJS();
+      // console.warn(fd,  Object.keys(fd).length );
+
+  plotInfo();
+      // console.log(fd ,  Object.keys(fd).length);
+  
+  writeJS();
+      // console.log(fd ,  Object.keys(fd).length);  
+  
+      console.log(`done plotting row ${fdrow}`);
+
+
+
+  
+}
