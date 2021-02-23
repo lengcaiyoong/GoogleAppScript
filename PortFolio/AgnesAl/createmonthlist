@@ -6,23 +6,17 @@ let ui = SpreadsheetApp.getUi();
 //let fail as stop execute
 
 let startMonth = 0;   //0 stands for Jan
-let endMonth = 2;
+let endMonth = 11;
 
 let input = ui.prompt( 'Please Insert the year' ) ;
 let year = input.getResponseText();
 
 
 
+
 ( !(parseInt(year) < 2100 ) || !(parseInt(year) > 2020) || year.length !== 4 || !(/\d{4}/.test(year)) || input.getSelectedButton() == ui.Button.CLOSE || isNaN(parseInt(year))|| parseInt(year) == '')? (ui.alert('Please Insert Valid Year'),console.error('Insert Invalid Year'),fail):'';
 
 console.log('cont...')
-
-let columnheader =  ['Comment',
-'UUID',
-'Timestamp',
-'Full Name',
-'Email address'];
-
 
 
 
@@ -53,55 +47,37 @@ let columnheader =  ['Comment',
      ); 
 
 
-    //Set Conditonal Format
+//     //Set Conditonal Format
 
-    ss.getSheetByName(nmMonth).setConditionalFormatRules(
-        [
-          SpreadsheetApp.newConditionalFormatRule()
-        .setRanges([ ss.getSheetByName(nmMonth).getRange('D2:D')])
-        .whenFormulaSatisfied('= countif($E$2:$E,$E2)>1')
-        .setBackground('#00FFFF')
-        .build()
-        ]
-     ); //End conditional Format
-
-
-    //Format cell
-    ss.getSheetByName(nmMonth).getRange('1:1').setFontWeight('bold').setFontColor('#85200c').setHorizontalAlignment('center');
-
-    ss.getSheetByName(nmMonth).getRange('A1:E1').setFontColor('#000000');
-
-    ss.getSheetByName(nmMonth).getRange('A2:A').setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
-
-    ss.getSheetByName(nmMonth).getRange('B2:E').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP); 
+//     ss.getSheetByName(nmMonth).setConditionalFormatRules(
+//         [
+//           SpreadsheetApp.newConditionalFormatRule()
+//         .setRanges([ ss.getSheetByName(nmMonth).getRange(...[2,hIdxS('Full Name',msheader(nmMonth)),trow-1,1])])
+//         .whenFormulaSatisfied(`= countif(${duplicateEmail})>1`)
+//         .setBackground('#00FFFF')
+//         .build()
+//         ]
+//      ); //End conditional Format
 
 
-  ss.getSheetByName(nmMonth).setFrozenRows(1);
-        //End format cell
+
+
+//     //Format cell
+//     ss.getSheetByName(nmMonth).getRange('1:1').setFontWeight('bold').setFontColor('#85200c').setHorizontalAlignment('center');
+
+//     ss.getSheetByName(nmMonth).getRange(...[ 1, 1, 1, msheader(nmMonth).filter( x=> typeof x !== 'object').filter( x => x!=='').length]
+// ).setFontColor('#000000');
+
+//     ss.getSheetByName(nmMonth).getRange(...[2,1,trow-1,msheader(nmMonth).filter( x=> typeof x !== 'object').filter( x => x!=='').length]).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP); 
+
+//     ss.getSheetByName(nmMonth).getRange(...[2,hIdxS('Comment',msheader(nmMonth)),trow-1,1]).setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
+
+
+//   ss.getSheetByName(nmMonth).setFrozenRows(1);
+//         //End format cell
 
 
       
       }//end for loop
 
 }
-
-
- monthlist = (m,y, d=1) => {     //by default d=1
-        return Array.from(
-          {   length:    
-            new Date( new Date( `${m+2}-${d}-2021 UTC+8`) -1 ).toLocaleDateString( 'default' ,{day: 'numeric', timeZone: 'Asia/Singapore'})   // Get Days of Last Day in month in UTC+8 
-              },  // End
-          
-          function(){   //add 24 hours for each loop
-        return  new Date (  this.start.getTime() + (8.64e7 * this.factor++))  
-        },   //End 
-        { start: ( new Date( `${m+1}-${d}-${y} UTC+8`) ) , //get Start Date of a month in Date Obj
-          factor: 0 
-          } // End
-        );
-      }
-
-
-      
-
-
