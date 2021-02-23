@@ -1,0 +1,36 @@
+function setCF4mainsheet(sheetName){
+
+//Set COnditional format
+  //put all rules into an arr
+  //then set the rules in the specified sheet
+      
+let sscond = SpreadsheetApp.newConditionalFormatRule();
+ 
+let formSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+
+
+//(1) Pending to write
+  let p2w = sscond
+        .setRanges([formSheet.getRange('A2:F')])
+        .whenFormulaSatisfied('=AND( AND(ArrayFormula(NOT(isblank($A2:$C2)))),isblank($I2))')
+        .setBackground('#FFFF00')
+        .build();
+  
+
+  //(2) Tag
+  let tagissue = sscond
+        .setRanges([formSheet.getRange('A2:F')])
+        .whenFormulaSatisfied('=AND(  AND(ArrayFormula(NOT(isblank($A2:$C2)))), NOT(isblank($H2)), NOT($H2 = "ROWDELETED")  )')
+        .setBackground('#FF0000')
+        .build();
+
+
+
+
+//Set Main sheet p2w and tagissue
+  formSheet.setConditionalFormatRules( [
+      p2w, tagissue
+      ] );
+
+
+}
