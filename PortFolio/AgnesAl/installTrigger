@@ -5,7 +5,9 @@
     
     ["editing", ScriptApp.EventType.ON_EDIT], 
     
-    ["sub", ScriptApp.EventType.ON_FORM_SUBMIT]  
+    ["sub", ScriptApp.EventType.ON_FORM_SUBMIT], 
+
+    ["customManualMenu", ScriptApp.EventType.ON_OPEN]
     
     ]
 
