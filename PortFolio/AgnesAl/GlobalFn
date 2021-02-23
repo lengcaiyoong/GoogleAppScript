@@ -1,0 +1,568 @@
+
+/**
+ * Date Tool box
+ */
+    //Convert Time To Date Obj   //dObj
+    //Convert Time To Millisecond  //mili  
+    //Replace HF1   //cHF
+    //Convert To range of dates //rdObj
+    //return nonduplicate set  //cdup
+    //get 1 date or 2 dates, ignore HF and hyphenate  //sd
+
+let dtb = {   //date tool box
+    dObj(d){return  new Date( d + "UTC+8")},
+    mili(d){return this.dObj(d).getTime()},
+    cHF(d){return d.replace(/([\(（]\s*HF[12]\s*[\)）])\s*/,'')},
+    gd(dstr){return dstr.match(/(\d?\d\s+\w{3}\s+\d{4})/ig)},
+    rdObj(dstr){
+     if(dtb.gd(dstr).length ==1){
+       return [dtb.dObj(dstr)];
+     }else{ 
+       return Array.from(
+          {length: ((Math.abs(dtb.dObj(dtb.gd(dstr)[0] ).getTime()-dtb.dObj( dtb.gd(dstr)[1]).getTime()))/8.64e7+1)}, 
+          function(){   //add 24 hours for each loop
+             return  new Date (  this.start.getTime() + (8.64e7 * this.factor++))  
+             }, 
+          {start: new Date((dtb.gd(dstr).sort( (a,b) => dtb.dObj(a) - dtb.dObj(b) )[0])+'UTC+8'),
+           factor: 0
+          }
+          );}
+                },
+    cdup(ts){return Array.from(new Set(ts))},
+    dmonth(utc8mili){ return new Date(utc8mili).toLocaleDateString('default',{month: 'short', timeZone:'Asia/Singapore'})} ,
+    nummonth(utc8mili){ return new Date(utc8mili).toLocaleDateString('default',{month: 'numeric', timeZone:'Asia/Singapore'}) -1 } ,
+    dyear(utc8mili){ return new Date(utc8mili).toLocaleDateString('default',{year: 'numeric', timeZone:'Asia/Singapore'})} 
+}
+
+
+// clear duplicate w/in AL type, convert to time str
+    //give some feedback if date is invalid
+
+dateClean = () => {
+try {
+    for (keys in fd){
+      if(RegExp(dot).test(keys)){
+        for (alType in fd[keys]){
+          fd[keys][alType] = dtb.cdup(
+            [].concat(...fd[keys][alType].map( x => dtb.rdObj(x)) ).map( x => x.getTime())
+          ) } }
+        };
+} catch(error){
+    console.error(`<<ERROR>>\n\n There might be invalid date at row ${fdrow}`);
+    sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("Invalid Dates or Format");
+    throw new Error("There might be invalid date or Format")
+}
+}
+
+
+
+
+//Get Monthly SHeet data
+  msdata = (sheetnamee) => ss.getSheetByName(sheetnamee).getDataRange().getValues();  //monthly sheet
+
+
+//Get Monthly SHeet data Header
+msheader = (mssheet) => SpreadsheetApp.getActiveSpreadsheet().getSheetByName(mssheet).getRange("1:1").getValues()[0];  //monthly sheet header
+
+
+
+//Get Timestamp col index
+  msheader = (mssheet) => SpreadsheetApp.getActiveSpreadsheet().getSheetByName(mssheet).getRange("1:1").getValues()[0];  //monthly sheet header
+
+
+//Get Pasted Row Number
+      get_prRow = (fd_date, sheetnamee) => 
+      msdata(sheetnamee).map(  x=> x[hIdxArr(tstmp,msheader(sheetnamee) )] ).map( (x,i) => [x].concat([i+1]) ).concat([[ (new Date(fd_date))]]).map(x =>  (typeof x[0] == 'object'&& x[0]!=='')? [x[0].getTime(),x[1]]:x   ).sort( (a,b) => a[0] - b[0]  ).reduce( (acc,cur,i) =>  
+          {if(cur[1] == undefined ){
+            prRow = acc[1]
+              return cur
+          }else{
+          return cur
+          }
+          }
+          ,[0,0]) 
+
+
+function fd2obj(){   //transform array to obj, split dates to 3 group
+let fdobj = headers.reduce( (acc, cur, i) => { acc[cur] = fd[i];return acc} ,{})
+  for ( key in fdobj){ RegExp(dot).test(key)?(fdobj[key] = {
+    Full: ( fdobj[key].split(/[,，]/)).filter( x => !(/HF[12]/.test(x)) ).filter(x => x !=='') ,
+    HF1:  ( fdobj[key].split(/[,，]/)).filter( x => (/HF1/).test(x)  ).filter(x => x !==''),
+    HF2:  ( fdobj[key].split(/[,，]/)).filter( x => (/HF2/).test(x) ).filter(x => x !=='')}):''
+;}
+  return fdobj;
+ }
+
+
+ function vdCheck(d){   //check if date is valid
+    let dy = d.match(/\b(0?[1-9]|[12]\d|30|31)\b/g);
+    let yea = d.match(/\d{4}/g);
+    let test_date = new Date(d );
+    return vdcheck =
+       test_date.getFullYear() == yea &&
+       test_date.getDate() == dy;
+ } 
+
+
+
+
+ monthlist = (m,y, d=1) => {     //by default d=1
+        return Array.from(
+          {   length:    
+            new Date( new Date( `${m+2}-${d}-2021 UTC+8`) -1 ).toLocaleDateString( 'default' ,{day: 'numeric', timeZone: 'Asia/Singapore'})   // Get Days of Last Day in month in UTC+8 
+              },  // End
+          
+          function(){   //add 24 hours for each loop
+        return  new Date (  this.start.getTime() + (8.64e7 * this.factor++))  
+        },   //End 
+        { start: ( new Date( `${m+1}-${d}-${y} UTC+8`) ) , //get Start Date of a month in Date Obj
+          factor: 0 
+          } // End
+        );
+      }
+
+
+/**
+ * Header index
+ */
+let hIdxS = (hname,headersData) =>  headersData.indexOf(hname)+1; //Header index for Spreadsheet usage
+let hIdxArr = (hname,headersData) =>  headersData.indexOf(hname); //Header index for array usage
+
+
+
+
+
+/**
+ * Invalid Detection
+ * 
+ */
+
+//Special remark detection
+   let detSPR = () => 
+   { 
+     //console.log(`checking ${srmk}....`);   //consolelog checking
+     //console.log(fd[hIdxArr(rmk,headers)]); //consolelog checking
+     fd[hIdxArr(rmk,headers)] !== ''?(sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(srmk), console.error(`<<ERROR>>:\n\n${srmk} at row ${fdrow}`),fail):'';
+   }
+
+
+
+//Blank date detection  //check if both is blank
+  let detblk = () => headers.reduce( (acc,cur, ind) => 
+    RegExp(dot).test(cur)?
+      acc.concat([fd[ind]]):acc,[])
+        .filter(x => x !=='').length == 0?
+          (console.error(`<<ERROR>>\n\n ${blkd} at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(blkd),fail)
+            :'';
+//End Here
+
+
+
+//Invalid Date Format (Only Date String Allowed)
+let detDobj = () => headers.map( (h,i) => RegExp(dot).test(h)?
+  (
+    typeof fd[i] !== 'object'? '': 
+  (sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(invfor), 
+    console.error(`<<ERROR>>:\n\nDate not in Text Format at row ${fdrow}`),
+    fail))
+    :'');
+// End Here
+
+
+
+//Blank Swap (if 1st is blank but 2nd isn't)
+  //
+
+swap = (  ) => 
+fd[hIdxArr( d1, headers )] == ''? 
+  (fd[hIdxArr( d1, headers )] = fd[hIdxArr( d2, headers )] ,fd[hIdxArr( d2, headers )]='' ):'';  
+
+
+
+
+//Invalid date detection
+  let detInvD = () => headers.map( (h,i) => RegExp(dot).test(h)? (fd[i] == ''?'':
+    fd[i].match(/(\d?\d\s+\w{3}\s+\d{4})/ig)==null?(sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(invdat),console.error(`${invdat} in data at row ${fdrow}`),fail):
+    
+    (  fd[i].match(/(\d?\d\s+\w{3}\s+\d{4})/ig).forEach(  d => 
+      (vdCheck(d) == false)? (console.error(`<<ERROR>>\n\n${invdat} Found at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(invdat),fail):''
+                                                    ))
+
+    ):''
+  );
+//
+
+
+//Edit Here
+
+//Duplicate Submit
+  let detDupSub = () => sheet.getDataRange().getValues().filter(
+    x => 
+    x[hIdxArr(emel,headers)] == fd[hIdxArr(emel,headers)] && 
+    x[hIdxArr(d1,headers)] == fd[hIdxArr(d1,headers)] && 
+    x[hIdxArr(d2,headers)] == fd[hIdxArr(d2,headers)] 
+  ).length > 1? (console.error(`<<ERROR>>\n\n Agent submitted duplicate data before!`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(dupsubdat),fail):'';
+//
+
+
+//Edit Here
+
+//Date crash Detection
+  //flatten object into array
+  //use set size to check if duplicate
+let detCrash = () => headers.map( (h,i) => 
+{if(RegExp(dot).test(h)){
+      var allALTYPE =   Object.entries(fd[h]).reduce( (acc, cur, ind) =>  
+      acc.concat(...cur[1]),[]);
+      allALTYPE.filter(x => x !== '').length == dtb.cdup(  allALTYPE  ).filter(x => x !== '').length?'':
+    (console.error(`<<ERROR>>\n\n${dcrash} at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(dcrash),fail)}});
+//
+
+
+//Subset Test- Flatten (flatDate and flatMonth)
+  //Flatten Objs to 2 Arrays
+    //call each Dot Obj
+    //Create Flat obj in array -> 
+        //Object Entries + reduce loop each ALtype and element and add Al type tag
+        // [].concat([]) will return []
+        // [].filter(String) return []
+        // [].concat([1]) return [1], same for [1].concat([])
+  //Either Empty Skip, 
+    //else (smallest or 2nd have all index >0) empty smallest
+let flatd1d2 = () => headers.map( (h,i) => 
+    {if ( RegExp(dot).test(h) ){
+
+    fd['flat'+h] =  Object.entries(fd[h]).reduce( (acc,cur,i) => 
+          acc.concat(cur[1].map( x => cur[0] + '-' + x   ))
+      ,[]).filter(x => x !== '');
+
+    fd[ mth +h] =  dtb.cdup(      //create month sheet
+          Object.entries(fd[h]).reduce( (acc,cur,i) => 
+              acc.concat(cur[1].map( x => dtb.dmonth(x)   ))
+              ,[]).filter(x => x !== '')
+              );
+                                };
+    }
+    );
+
+
+//Subset Empty Test
+  //loop each keys obj.entries(fd)
+    //if name has "flat" and not empty and acc is empty
+      //put acc
+    //if name is flat and not empty and acc isn't empty
+      //compare with acc
+        // basically acc is 1st. cur is 2nd
+            //if acc < cur, swap acc and cur
+            //set variable swap as true if acc <cur
+        // act upon cur indexOf every >=0
+          //clear flat cur  and Object.entries(fd[replace flat to '']).map()
+          //swap flat and fd if required
+
+
+  let detSub = () => Object.entries(fd).reduce( (acc,cur,i) => {
+  
+  if( RegExp(flt).test(cur[0]) && cur[1].length >0 && acc.length == 0  ){
+      return acc.concat(cur)
+  
+  }else if( RegExp(flt).test(cur[0]) && cur[1].length >0 && acc.length > 0 ){
+      
+      if( acc[1].length < cur[1].length ){
+        var firstIsEmp = true;
+          [acc,cur] = [cur,acc];}
+
+    console.log(`Swap in subset test: ${firstIsEmp}`),
+
+    cur[1].map( (x,ind) => acc[1].indexOf(x) ).every( j => j>=0 )? 
+     ( fd[cur[0]] = [],
+      
+      Object.entries(fd[cur[0].replace(flt,'')]).map( (x,i) =>   
+        fd[cur[0].replace(flt,'')][x[0]] = []) ,
+      
+      firstIsEmp? (
+      (function (){ [fd[cur[0]], fd[acc[0]]] = [fd[acc[0]], fd[cur[0]]]})(),
+      (function(){ [fd[cur[0].replace(flt,'')], fd[acc[0].replace(flt,'')  ]] = [fd[acc[0].replace(flt,'')  ], fd[cur[0].replace(flt,'')]]})()
+        ):''
+
+    )
+     :'';
+
+  return acc
+
+  }else{
+    return acc
+  }
+
+  }
+
+  ,[]);
+
+
+//Detect if more than 1 month (comment)
+  //Regex to get monthlysheet
+    //RegExp(mth).test(cur[0])
+    detCmt = () => 
+          {
+          var allMonthInvolved =  dtb.cdup(
+             Object.entries( fd ).reduce( (acc,cur,i) =>
+               RegExp(mth).test(cur[0])? acc.concat( cur[1]):acc
+                  ,[]));
+          allMonthInvolved.length > 1? ( fd[cmt] = `more than 1 month \n( ${allMonthInvolved} )`
+                                      ):'';
+            }
+
+
+
+
+//Swap DoA if 1st is empty
+    //{ [objt3['arr1'], objt3['arr2']] = [objt3['arr2'], objt3['arr1']]};
+
+
+//Generate uuid
+  guuid = () => fd[id] = `${['t','g','z'][Math.floor(Math.random() * ['a','b','c'].length)]}${ fd[tstmp].getTime() }${new Date().getTime()}` ;
+
+//Generate color
+  colorpencil = () => fd['color'] =  colors[Math.floor(Math.random() * colors.length)];
+  
+
+
+//// Plotting
+      // Get PlotData, Run PlotData
+  function plotInfo (){
+    Object.entries( fd ).map( (x,i) => 
+      { 
+        if(RegExp('\\b'+dot).test(x[0])) {       //keys of fd
+  /**
+   * Get plotData
+   */
+
+    var plotData =   Object.entries(fd[x[0]]).reduce(  (acc,cur,i) => //altype
+      {
+        cur[1].reduce( (acc2,cur2,ind) =>  //element in altype, cur[0] is key
+            //if keys undefined, create new keys
+            {    
+              if(acc[dtb.dmonth(cur2)]  == undefined ){   
+                acc[dtb.dmonth(cur2)] =  monthlist( dtb.nummonth(cur2), dtb.dyear(cur2) );       //create list of dates
+                
+                //console.warn(acc); // consolelog checking
+                //console.warn(cur2, dtb.nummonth(cur2), dtb.dyear(cur2)  ); // consolelog checking
+                //console.warn (acc[dtb.dmonth(cur2)] ); // consolelog checking
+
+                acc[dtb.dmonth(cur2)] = acc[dtb.dmonth(cur2)].map( j =>  j.getTime()).map( k =>  k == cur2?cur[0]:k);   //convert time to keys
+                  
+                  //console.warn(acc ); // consolelog checking
+
+                return acc2                                                
+              }else{            
+            //else paste related keys
+                
+                //console.log(acc); // consolelog checking
+                //console.log(acc[dtb.dmonth(cur2)]); // consolelog checking
+
+              acc[dtb.dmonth(cur2)] = acc[dtb.dmonth(cur2)].map( k =>  k == cur2?cur[0]:k);
+
+                  // console.log(acc); // consolelog checking
+                    
+                    return acc2
+                  
+                    }
+            } // End reduce statement for Each Al type elements
+            ,[]); // End reduce
+          
+          // console.error (acc); // consolelog checking
+          
+          return acc
+      }
+      ,{});
+      
+
+
+
+  /** 
+   * Run plotData
+   */
+
+    if( Object.keys(plotData).length == 0 ){  //if empty
+        console.log("Empty plotData detected"); 
+      }else{ 
+
+        for (key in plotData){   //loop each plotData
+          
+          //Variables
+              // msdata(key) //whole sheet
+              // msheader(key)   //get header
+              // plotData[key]  // plot array
+      
+      //Get prRow
+      prRow = msdata(key).map( (x,i) => x[hIdxArr(id,msheader(key))]  ).findIndex(  x => x == fd[id] ); 
+      prRow == -1?(get_prRow(fd[tstmp],key),ss.getSheetByName(key).insertRowAfter(prRow)):console.log(`Found plotted Data before ${x[0]}`);   //need to insert row or use previous row data
+
+      // console.warn(Object.keys(plotData), Object.keys(plotData).length ); //consolelog checking
+      // console.warn ( prRow); //consolelog checking
+
+      //Set Value and Notes/Background based conditionally  
+    if ( new RegExp(reDOA2,"ig").test(x[0]) ){
+
+          //set notes
+
+      //console.warn(msheader(key).filter( x=> typeof x !== 'object').filter( x => x!== '').length) //consolelog checking
+
+      // console.warn(  [plotData[key].map( p => typeof p == 'number'?'':p )]  ); //consolelog checking
+
+      // console.warn(  msheader(key).filter( x=> typeof x !== 'object').filter( x => x!=='').map( y => fd[y] ) ); //consolelog checking
+
+    ss.getSheetByName(key)
+        .getRange( 
+              prRow+1, 
+              (msheader(key).map(  (x,i) => typeof x  ).indexOf('object')+1) , 
+              1 , 
+              plotData[key].length  )
+          .setNotes(  [plotData[key].map( p => typeof p == 'number'?'':p )]  )
+
+        //set value, only write basic data on spreadsheet
+        ss.getSheetByName(key)
+              .getRange( 
+                      prRow+1, 
+                      msheader(key).findIndex( x => x !== '') + 1 , 
+                      1 , 
+                      msheader(key).filter( x=> typeof x !== 'object').filter( x => x!== '').length
+                        )
+              .setValues( 
+            [
+              msheader(key).filter( x=> typeof x !== 'object').filter( x => x!=='')
+              .map( y => fd[y] )
+            ]
+            );
+        //End setting notes and value
+
+      } else if ( new RegExp(reDOA1,"ig").test(x[0])  )
+      {
+          //set backgound
+
+      //console.log([plotData[key].map( p => typeof p == 'number'?'#ffffff':fd[clr] )] ); //consolelog checking
+      //console.log( plotData[key].map( x=> (x == 'Full' || typeof x == 'number')?'':x ) ); //consolelog checking
+      // console.log( 
+      //   [msheader(key).filter( x=> typeof x !== 'object').filter( x => x !== '').map( y => fd[y] ).concat(plotData[key].map(  p=> (p == 'Full' || typeof p == 'number')?'':p    ))]
+      // ); //consolelog checking
+      // console.log( plotData[key].length)  //consolelog checking
+      
+
+    ss.getSheetByName(key)
+        .getRange( 
+              prRow+1, 
+              (msheader(key).map(  (x,i) => typeof x  ).indexOf('object')+1) , 
+              1 , 
+              plotData[key].length  )
+          .setBackgrounds( [plotData[key].map( p => typeof p == 'number'?'#ffffff':fd[clr] )]  )
+
+        //set value, write basic data and dateobj on spreadsheet
+        ss.getSheetByName(key)
+              .getRange( 
+                      prRow+1, 
+                      msheader(key).findIndex( x => x !== '') + 1 , 
+                      1 , 
+                      msheader(key).filter( x => x !== '' ).length
+                        )
+              .setValues( 
+            [msheader(key).filter( x=> typeof x !== 'object').filter( x => x !== '').map( y => fd[y] ).concat(plotData[key].map(  p=> (p == 'Full' || typeof p == 'number')?'':p    ))]
+            );
+            //End setting background and value
+      }
+
+      } //end for loop within plotData
+
+          } // end for  Object.keys(plotData).length > 0
+
+
+    } //end for DoA
+      }  // end for fd map
+    );   // end for fd map
+  };
+  // To get monthlySheet , refer comment regex
+// End Plotting
+
+
+//Delete Previous Data
+
+  delPreJS = () => {
+      if ( sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).getValue( ) !== '' ){
+        
+        var prJS = JSON.parse(sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).getValue( ));  //Get and Convert previous JS to Object
+
+        var allMonthlySheet = dtb.cdup(       //get month sheet from prJS
+              Object.entries( prJS ).reduce( (acc,cur,i) =>
+                RegExp(mth).test(cur[0])? acc.concat( cur[1]):acc
+                    ,[]));
+
+                //console.warn( allMonthlySheet); //consolelog checking
+                //console.warn( JSON.parse(sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).getValue( ))[id] ); //consolelog checking
+
+      for ( monthsheet of allMonthlySheet ){   //for loop. delete row or return 'fail' if cannot find
+        var  monthIndex =  msdata(monthsheet).map(  x=> 
+                {
+                
+                //console.warn(msheader(monthsheet) ); //consolelog checking
+                //console.warn( hIdxArr(id,msheader(monthsheet))   ); //consolelog checking
+                //console.warn( x[hIdxArr(id,msheader(monthsheet) )]  ); //consolelog checking
+                
+                return  x[hIdxArr(id,msheader(monthsheet) )] 
+                }
+                )
+              .findIndex( i => i ==  prJS[id] ) ;//previous JSON uuid
+        
+              // console.warn( monthIndex); //consolelog checking
+
+        monthIndex== -1 ? ( sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue(  'Previous UUID Missing!' ),console.error("Previous UUID MISSING"),fail ):( ss.getSheetByName(monthsheet).deleteRow(monthIndex+1), console.log('deleted previous data'));
+    
+      } //end for loop
+
+      sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).setValue(''); // delete previos JSON once delete dashboard item
+
+      } //end when Json is nonEmpty
+
+  };  //end function delPreJS
+//End Delete Previous data    
+    
+
+//  JSON.parse(sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).getValue( ))[id]  //previous JS id
+
+  
+//store object to another
+  //use reduce to loop
+  //Object.entries -> reduce
+
+
+
+
+//Return JSON 
+writeJS = () => {
+
+try{
+
+  sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).setValue( JSON.stringify(  //write JSON to Spreadsheet
+
+  Object.entries( fd ).reduce( (acc,cur,i) =>   //get monthlysheet, timestamp and id
+  {
+    //console.warn(cur[1], acc); //consolelog checking (if regex not match, consolelog, else consolewarn)
+
+  if ( RegExp(mth).test(cur[0]) || RegExp(tstmp).test(cur[0]) ||RegExp(id).test(cur[0]) ){
+    acc[cur[0]] = cur[1];
+    return acc
+     };
+    
+    //console.log(acc);  //consolelog checking
+        return acc
+  }
+  ,{})  //End 
+) ); //End Write to Spreadsheet
+
+}catch(error){  //if error causing unable to write JS
+   
+  sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("ISSUE Writing JSON");
+  console.error(`<<ERROR>>:\n\nJSON File hasn't written on Spreadsheet`);
+  fail;
+}
+
+};
+
+
