@@ -2,9 +2,30 @@
  * Declare Variable
  */
 
+
+
+
 //Spreadsheet Variable
-let ss = SpreadsheetApp.getActiveSpreadsheet();
+let bt = 'Button'; //Sheet Name for Parameters
+var ss = SpreadsheetApp.getActiveSpreadsheet(); //Get Active SpreadSheet
 var response_sheetName = '';
+
+
+
+// Alternative Spreadsheet Variables
+// let ss = SpreadsheetApp.getActiveSpreadsheet();
+// var response_sheetName = '';
+// let ssResto = SpreadsheetApp
+//     .openByUrl(
+//       'https://docs.google.com/spreadsheets/d/16H7qXSiKikka59tSH-ZEppHe_p8Ik71yCmpvxjTMUIo/edit#gid=0'
+//      );
+// let ssEc = SpreadsheetApp
+//     .openByUrl(
+//       'https://docs.google.com/spreadsheets/d/1j_hQVpkhq8k5cSnlOJu5GK5LdTvdwd3eiCd4i1dRkkw/edit#gid=0'
+//     );
+//   let dashboard_Array = [ssResto,ssEc]; //Put two sheets in Array
+
+
 
 
 
@@ -38,7 +59,9 @@ let tagarr = [blkd,invfor,invdat,dupsubdat,dcrash]; //not including special rema
 
 // color array
     //white '#ffffff'
-  let colors =  [ '#ffff00', '#0000ff',  '#00ff00',  '#e69138', '#ff0000', '#9900ff', '#00ffff' ];
+  let colors =  [ '#d9ead3', '#ffe599',  '#ff9900',  '#ead1dc', '#ffff00', '#00ff00', '#00ffff' ];
+
+  
 
 //Get Headers
 let headers = '';
@@ -58,6 +81,11 @@ var sheet, fdrow, prRow , fd  ;
       //var sheet = ss.getSheetByName(response_sheetName);
       //let headers = ss.getSheetByName(response_sheetName).getRange("1:1").getValues()[0];  //headers
 
+//flush fn
+flush = () => {
+    SpreadsheetApp.flush();
+    SpreadsheetApp.flush();
+};
 
 
 //Template Spreadsheet Variables
@@ -68,21 +96,19 @@ var sheet, fdrow, prRow , fd  ;
   //Monthly Sheet Column Header
 
     let columnheader =  ['Comment',
-        'UUID',
-        'Timestamp',
+        id,
+        tstmp,
         'LOB',
         'Full Name',
-        'Email address'];
+        emel];
 
 //Conditonal Format Variables
-let tagAndP2W = 'A2:F';
-  let basicInfo = '$A2:$D2';
-  let tagcol    = '$H2';
-  let jscol     = '$I2';
+let tagAndP2W = 'A1:F';
+  let basicInfo = '$A1:$D1';
+  let tagcol    = '$H1';
+  let jscol     = '$I1';
+  let lobcol    = '$C1' //to prevent heading being highlight
   
 
 let duplicateEmail = '$F$2:$F,$F2';
-
-
-
 
