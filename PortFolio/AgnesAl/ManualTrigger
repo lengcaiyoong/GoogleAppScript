@@ -59,6 +59,8 @@ function manual() {
       fdrow = i;
       fd = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(response_sheetName).getRange(eval("`${fdrow}:${fdrow}`")).getValues()[0]; //form data
 
+
+
   try{        //try to run codes, if fail will catch error
         detSPR();
         swap() // swap doA 1st and 2nd if 1st is blank
@@ -83,6 +85,14 @@ function manual() {
         writeJS();
             // console.log(fd ,  Object.keys(fd).length);  
             console.log(`done plotting row ${fdrow}`);
+
+      
+            //Check Tags
+      fd[hIdxArr(tg, headers)] == ''?'':
+        (sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue(''),
+        flush())
+        ;
+      
       }catch(error){
         console.log(`Row ${fdrow} is skipped`)
         continue;
@@ -92,3 +102,5 @@ function manual() {
   } //end for loop
 
 };            
+
+
