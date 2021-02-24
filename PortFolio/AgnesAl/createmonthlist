@@ -1,3 +1,9 @@
+/**
+ * 1 Spreadsheet for Resto & E&C
+ */
+
+
+
 function monthTemplate() {
 
 let ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -47,37 +53,51 @@ console.log('cont...')
      ); 
 
 
-//     //Set Conditonal Format
+    //Set Conditonal Format
 
-//     ss.getSheetByName(nmMonth).setConditionalFormatRules(
-//         [
-//           SpreadsheetApp.newConditionalFormatRule()
-//         .setRanges([ ss.getSheetByName(nmMonth).getRange(...[2,hIdxS('Full Name',msheader(nmMonth)),trow-1,1])])
-//         .whenFormulaSatisfied(`= countif(${duplicateEmail})>1`)
-//         .setBackground('#00FFFF')
-//         .build()
-//         ]
-//      ); //End conditional Format
-
-
+    ss.getSheetByName(nmMonth).setConditionalFormatRules(
+        [
+          SpreadsheetApp.newConditionalFormatRule()
+        .setRanges([ ss.getSheetByName(nmMonth).getRange(...[2,hIdxS('Full Name',msheader(nmMonth)),trow-1,1])])
+        .whenFormulaSatisfied(`= countif(${duplicateEmail})>1`)
+        .setBackground('#00FFFF')
+        .build()
+        ]
+     ); //End conditional Format
 
 
-//     //Format cell
-//     ss.getSheetByName(nmMonth).getRange('1:1').setFontWeight('bold').setFontColor('#85200c').setHorizontalAlignment('center');
-
-//     ss.getSheetByName(nmMonth).getRange(...[ 1, 1, 1, msheader(nmMonth).filter( x=> typeof x !== 'object').filter( x => x!=='').length]
-// ).setFontColor('#000000');
-
-//     ss.getSheetByName(nmMonth).getRange(...[2,1,trow-1,msheader(nmMonth).filter( x=> typeof x !== 'object').filter( x => x!=='').length]).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP); 
-
-//     ss.getSheetByName(nmMonth).getRange(...[2,hIdxS('Comment',msheader(nmMonth)),trow-1,1]).setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
 
 
-//   ss.getSheetByName(nmMonth).setFrozenRows(1);
-//         //End format cell
+    //Format cell
+    ss.getSheetByName(nmMonth).getRange('1:1').setFontWeight('bold').setFontColor('#85200c').setHorizontalAlignment('center');
+
+    ss.getSheetByName(nmMonth).getRange(...[ 1, 1, 1, msheader(nmMonth).filter( x=> typeof x !== 'object').filter( x => x!=='').length]
+).setFontColor('#000000');
+
+    ss.getSheetByName(nmMonth).getRange(...[2,1,trow-1,msheader(nmMonth).filter( x=> typeof x !== 'object').filter( x => x!=='').length]).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP); 
+
+    ss.getSheetByName(nmMonth).getRange(...[2,hIdxS('Comment',msheader(nmMonth)),trow-1,1]).setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
+
+
+  //Create an extra Row after Headings (Format Issue)
+  ss.getSheetByName(nmMonth).getRange("2:2").setValues(
+ss.getSheetByName(nmMonth).getRange("1:1").getValues()
+);  
+  ss.getSheetByName(nmMonth).hideRows(2)  //hide 2nd row
+
+
+  ss.getSheetByName(nmMonth).setFrozenRows(1);
+        //End format cell
 
 
       
       }//end for loop
 
 }
+
+
+
+
+      
+
+
