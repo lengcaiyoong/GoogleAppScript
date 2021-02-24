@@ -57,6 +57,7 @@ try {
 
 
 
+
 //Get Monthly SHeet data
   msdata = (sheetnamee) => ss.getSheetByName(sheetnamee).getDataRange().getValues();  //monthly sheet
 
@@ -142,7 +143,13 @@ let hIdxArr = (hname,headersData) =>  headersData.indexOf(hname); //Header index
    { 
      //console.log(`checking ${srmk}....`);   //consolelog checking
      //console.log(fd[hIdxArr(rmk,headers)]); //consolelog checking
-     fd[hIdxArr(rmk,headers)] !== ''?(sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(srmk), console.error(`<<ERROR>>:\n\n${srmk} at row ${fdrow}`),fail):'';
+     fd[hIdxArr(rmk,headers)] !== ''?(
+       sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(srmk), 
+       flush(),
+       console.error(`<<ERROR>>:\n\n${srmk} at row ${fdrow}`),
+       fail
+       )
+       :'';
    }
 
 
@@ -152,7 +159,7 @@ let hIdxArr = (hname,headersData) =>  headersData.indexOf(hname); //Header index
     RegExp(dot).test(cur)?
       acc.concat([fd[ind]]):acc,[])
         .filter(x => x !=='').length == 0?
-          (console.error(`<<ERROR>>\n\n ${blkd} at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(blkd),fail)
+          (console.error(`<<ERROR>>\n\n ${blkd} at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(blkd),flush(),fail)
             :'';
 //End Here
 
@@ -163,6 +170,7 @@ let detDobj = () => headers.map( (h,i) => RegExp(dot).test(h)?
   (
     typeof fd[i] !== 'object'? '': 
   (sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(invfor), 
+    flush(),
     console.error(`<<ERROR>>:\n\nDate not in Text Format at row ${fdrow}`),
     fail))
     :'');
@@ -182,10 +190,10 @@ fd[hIdxArr( d1, headers )] == ''?
 
 //Invalid date detection
   let detInvD = () => headers.map( (h,i) => RegExp(dot).test(h)? (fd[i] == ''?'':
-    fd[i].match(/(\d?\d\s+\w{3}\s+\d{4})/ig)==null?(sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(invdat),console.error(`${invdat} in data at row ${fdrow}`),fail):
+    fd[i].match(/(\d?\d\s+\w{3}\s+\d{4})/ig)==null?(sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(invdat),flush(),console.error(`${invdat} in data at row ${fdrow}`),fail):
     
     (  fd[i].match(/(\d?\d\s+\w{3}\s+\d{4})/ig).forEach(  d => 
-      (vdCheck(d) == false)? (console.error(`<<ERROR>>\n\n${invdat} Found at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(invdat),fail):''
+      (vdCheck(d) == false)? (console.error(`<<ERROR>>\n\n${invdat} Found at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(invdat),flush(),fail):''
                                                     ))
 
     ):''
@@ -201,7 +209,7 @@ fd[hIdxArr( d1, headers )] == ''?
     x[hIdxArr(emel,headers)] == fd[hIdxArr(emel,headers)] && 
     x[hIdxArr(d1,headers)] == fd[hIdxArr(d1,headers)] && 
     x[hIdxArr(d2,headers)] == fd[hIdxArr(d2,headers)] 
-  ).length > 1? (console.error(`<<ERROR>>\n\n Agent submitted duplicate data before!`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(dupsubdat),fail):'';
+  ).length > 1? (console.error(`<<ERROR>>\n\n Agent submitted duplicate data before!`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(dupsubdat),flush(),fail):'';
 //
 
 
@@ -215,7 +223,7 @@ let detCrash = () => headers.map( (h,i) =>
       var allALTYPE =   Object.entries(fd[h]).reduce( (acc, cur, ind) =>  
       acc.concat(...cur[1]),[]);
       allALTYPE.filter(x => x !== '').length == dtb.cdup(  allALTYPE  ).filter(x => x !== '').length?'':
-    (console.error(`<<ERROR>>\n\n${dcrash} at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(dcrash),fail)}});
+    (console.error(`<<ERROR>>\n\n${dcrash} at row ${fdrow}`),sheet.getRange(fdrow,hIdxS(tg,headers)).setValue(dcrash),flush(),fail)}});
 //
 
 
@@ -403,7 +411,7 @@ let flatd1d2 = () => headers.map( (h,i) =>
       //Set Value and Notes/Background based conditionally  
     if ( new RegExp(reDOA2,"ig").test(x[0]) ){
 
-          //set notes
+      //Set notes
 
       //console.warn(msheader(key).filter( x=> typeof x !== 'object').filter( x => x!== '').length) //consolelog checking
 
@@ -411,13 +419,34 @@ let flatd1d2 = () => headers.map( (h,i) =>
 
       // console.warn(  msheader(key).filter( x=> typeof x !== 'object').filter( x => x!=='').map( y => fd[y] ) ); //consolelog checking
 
-    ss.getSheetByName(key)
+
+          //clear previous format before add notes
+            //if using previous data, no need to clear format
+
+    msdata(key).map( (x,i) => x[hIdxArr(id,msheader(key))]  ).findIndex(  x => x == fd[id] ) == -1?
+              ss.getSheetByName(key)      //Clear Format
+              .getRange( 
+              prRow+1, 
+              (msheader(key).map(  (x,i) => typeof x  ).indexOf('object')+1) , 
+              1 , 
+              plotData[key].length  )
+          .clearFormat():'';      
+
+          flush()  // flush after clearformat
+
+          //End clear format
+
+
+    ss.getSheetByName(key)      //Set Notes
         .getRange( 
               prRow+1, 
               (msheader(key).map(  (x,i) => typeof x  ).indexOf('object')+1) , 
               1 , 
               plotData[key].length  )
           .setNotes(  [plotData[key].map( p => typeof p == 'number'?'':p )]  )
+
+        flush(); //flush after setNotes
+
 
         //set value, only write basic data on spreadsheet
         ss.getSheetByName(key)
@@ -433,6 +462,9 @@ let flatd1d2 = () => headers.map( (h,i) =>
               .map( y => fd[y] )
             ]
             );
+
+          flush(); // flush after setValue
+
         //End setting notes and value
 
       } else if ( new RegExp(reDOA1,"ig").test(x[0])  )
@@ -447,13 +479,35 @@ let flatd1d2 = () => headers.map( (h,i) =>
       // console.log( plotData[key].length)  //consolelog checking
       
 
-    ss.getSheetByName(key)
+
+          //clear previous format before add notes
+              //if using previous data, no need to clear format
+
+    msdata(key).map( (x,i) => x[hIdxArr(id,msheader(key))]  ).findIndex(  x => x == fd[id] ) == -1?
+          ss.getSheetByName(key)    //clear format
+        .getRange( 
+              prRow+1, 
+              (msheader(key).map(  (x,i) => typeof x  ).indexOf('object')+1) , 
+              1 , 
+              plotData[key].length  )
+          .clearFormat()
+          :'';
+          
+        flush()  // flush after clearformat
+
+           //End clear format
+
+
+
+    ss.getSheetByName(key)    //Set Background
         .getRange( 
               prRow+1, 
               (msheader(key).map(  (x,i) => typeof x  ).indexOf('object')+1) , 
               1 , 
               plotData[key].length  )
           .setBackgrounds( [plotData[key].map( p => typeof p == 'number'?'#ffffff':fd[clr] )]  )
+
+        flush()  // flush after setbackground
 
         //set value, write basic data and dateobj on spreadsheet
         ss.getSheetByName(key)
@@ -466,8 +520,12 @@ let flatd1d2 = () => headers.map( (h,i) =>
               .setValues( 
             [msheader(key).filter( x=> typeof x !== 'object').filter( x => x !== '').map( y => fd[y] ).concat(plotData[key].map(  p=> (p == 'Full' || typeof p == 'number')?'':p    ))]
             );
+          
+          flush()  // flush after setbackground
+
             //End setting background and value
-      }
+
+    } //End for setbackground
 
       } //end for loop within plotData
 
@@ -512,11 +570,18 @@ let flatd1d2 = () => headers.map( (h,i) =>
         
               // console.warn( monthIndex); //consolelog checking
 
-        monthIndex== -1 ? ( sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue(  'Previous UUID Missing!' ),console.error("Previous UUID MISSING"),fail ):( ss.getSheetByName(monthsheet).deleteRow(monthIndex+1), console.log('deleted previous data'));
+        monthIndex== -1 ? ( sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue(  'Previous UUID Missing!' ),flush(),console.error("Previous UUID MISSING"),fail ):
+        (
+        ss.getSheetByName(monthsheet).deleteRow(monthIndex+1), 
+        flush(),
+        console.log('deleted previous data')
+        );
     
       } //end for loop
 
       sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).setValue(''); // delete previos JSON once delete dashboard item
+
+      flush(); //flush after delete previous JSON
 
       } //end when Json is nonEmpty
 
@@ -556,9 +621,13 @@ try{
   ,{})  //End 
 ) ); //End Write to Spreadsheet
 
+flush(); // flush after write to Spreadsheet
+flush(); // flush after write to Spreadsheet
+
 }catch(error){  //if error causing unable to write JS
    
   sheet.getRange(fdrow,hIdxS(tg,headers)).setValue("ISSUE Writing JSON");
+  flush();
   console.error(`<<ERROR>>:\n\nJSON File hasn't written on Spreadsheet`);
   fail;
 }
