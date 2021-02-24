@@ -23,7 +23,16 @@ let formSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
   //(2) Tag
   let tagissue = sscond
         .setRanges([formSheet.getRange(tagAndP2W)])
-        .whenFormulaSatisfied(`=AND(  AND(ArrayFormula(NOT(isblank(${basicInfo})))), NOT(isblank(${tagcol})), NOT(${tagcol} = "ROWDELETED")  )`)
+        .whenFormulaSatisfied(
+          `=AND(  
+AND(ArrayFormula(NOT(isblank(
+  ${basicInfo})))), 
+NOT(isblank(
+  ${tagcol})), NOT(
+    ${tagcol} = "ROWDELETED") , 
+NOT(
+  ${lobcol}="LOB"))`
+          )
         .setBackground('#FF0000')
         .build();
 
