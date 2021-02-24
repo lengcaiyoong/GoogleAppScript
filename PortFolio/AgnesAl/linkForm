@@ -44,11 +44,11 @@ SpreadsheetApp.getActiveSpreadsheet().getSheets().filter(
   headers =  SpreadsheetApp.getActiveSpreadsheet().getSheets()
             .filter( x => /Form responses/i.test(x.getSheetName()))[0].getRange("1:1").getValues()[0].filter( x=> x !== '');
 
-  // setCF4mainsheet(
-  //   SpreadsheetApp.getActiveSpreadsheet().getSheets().filter(
-  //       x => /Form responses/i.test(x.getSheetName())
-  //             )[0].getSheetName()
-  //             )  //set conditional formatting on mainsheet
+  setCF4mainsheet(
+    SpreadsheetApp.getActiveSpreadsheet().getSheets().filter(
+        x => /Form responses/i.test(x.getSheetName())
+              )[0].getSheetName()
+              )  //set conditional formatting on mainsheet
 
   SpreadsheetApp.getUi().alert( 'DONE Linked To Spreadsheet' )
 
