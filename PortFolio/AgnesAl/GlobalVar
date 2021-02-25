@@ -46,6 +46,9 @@ let clr = 'color';
 let cmt = 'Comment';
 let reDOA1 = "\\b"+dot+"(?!\\s\\(Option 2\\))";
 let reDOA2 = "\\b"+dot+"(?=\\s\\(Option 2\\))";
+let lb = 'LOB';
+let rst = 'Resto';
+let ec = 'E&C';
 
 //Tag
 let srmk = 'Special Remark';
@@ -68,8 +71,8 @@ let headers = '';
 
 
 //Changeable variable
-var sheet, fdrow, prRow , fd  ;
-
+var sheet, fdrow, prRow , fd , copiedFilter, statuscopFil;
+  
 
 //Stop exe = fail
 //Stop exe 2 = stop
@@ -98,7 +101,7 @@ flush = () => {
     let columnheader =  ['Comment',
         id,
         tstmp,
-        'LOB',
+        lb,
         'Full Name',
         emel];
 
