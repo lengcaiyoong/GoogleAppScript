@@ -1,0 +1,49 @@
+/**
+ * For OnSub/OnEdit and Manual Trigger
+ * Need To Refresh Filter
+ * Kindly refer Fn gtFil,copFil and refFil at GloBal Fn
+ */
+    //once edit, submit and manual trigger
+    //and write data
+    //if can copy , copied the value and applied again
+
+
+ cr8Fil = () =>  
+  { try{ 
+      ss.getDataRange().createFilter();
+      }catch(error){  //remove filter
+      console.log('filter created');
+        }};
+
+ rmvFil = () =>  
+    {try{ 
+      ss.getActiveSheet().getFilter().remove();
+      }catch(error){  //remove filter
+      console.log('filter removed');
+        }};
+
+  
+ criResto = () => 
+  {
+   cr8Fil(); //Try to create filter
+    ss.getActiveSheet().getFilter()
+      .setColumnFilterCriteria(
+  hIdxS( lb , msheader(ss.getActiveSheet().getSheetName()) ),  //Lob Col index
+   SpreadsheetApp.newFilterCriteria()   //Set Criteria
+  .setHiddenValues(['', ec])
+  .build()  //End setting Criteria
+        );
+  }
+
+ criEC = () => 
+ {
+   cr8Fil(); //Try to create filter
+   ss.getActiveSheet().getFilter()
+   .setColumnFilterCriteria(
+   hIdxS( lb , msheader(ss.getActiveSheet().getSheetName()) ), //Lob Col index
+   SpreadsheetApp.newFilterCriteria()     //Set Criteria
+  .setHiddenValues(['', rst])
+  .build()  //End setting Criteria
+    );
+ }
+
