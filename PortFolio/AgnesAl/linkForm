@@ -8,6 +8,17 @@ function linkForm() {
       //             )[0]
 
 
+//ask if change the SSRE id in app script
+var confirmChange = SpreadsheetApp.getUi().alert('Have you change the SSRE id in Script?', SpreadsheetApp.getUi().ButtonSet.YES_NO);
+  if(confirmChange == SpreadsheetApp.getUi().Button.YES){
+        console.log("Start Executing~ Please wait...")
+      }else{
+        console.log("please open Script and modify it...");
+        return SpreadsheetApp.getUi().alert( " :) ");
+        }
+
+
+
 let formid = SpreadsheetApp.getUi().prompt( 'Enter Google Form URL' );
 
 
@@ -54,12 +65,16 @@ SpreadsheetApp.getActiveSpreadsheet().getSheets().filter(
 
   monthTemplate(); //Create Monthly Tab
 
+  
   installTriggers(); //Install 3 Triggers
 
    
    SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Button').hideSheet();  //Hide Button Sheet
    
    SpreadsheetApp.getActiveSpreadsheet().getSheets()[0].activate();  //set First Page As Active
+
+
+  
 
 };
 
