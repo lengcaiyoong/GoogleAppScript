@@ -13,17 +13,10 @@ var response_sheetName = '';
 
 
 // Alternative Spreadsheet Variables
-// let ss = SpreadsheetApp.getActiveSpreadsheet();
-// var response_sheetName = '';
-// let ssResto = SpreadsheetApp
-//     .openByUrl(
-//       'https://docs.google.com/spreadsheets/d/16H7qXSiKikka59tSH-ZEppHe_p8Ik71yCmpvxjTMUIo/edit#gid=0'
-//      );
-// let ssEc = SpreadsheetApp
-//     .openByUrl(
-//       'https://docs.google.com/spreadsheets/d/1j_hQVpkhq8k5cSnlOJu5GK5LdTvdwd3eiCd4i1dRkkw/edit#gid=0'
-//     );
-//   let dashboard_Array = [ssResto,ssEc]; //Put two sheets in Array
+ let ssRestoURL = 'https://docs.google.com/spreadsheets/d/1M9zDdtvt2Z1vnX_HHTK6pC-9eSMxhuob7RB6Fl8E8ho/edit#gid=1640387092';
+ let ssEcURL = 'https://docs.google.com/spreadsheets/d/1n6JC53mmigYvkbxM9raUE0yuiaFi1REwwx5EcFB0KxI/edit?usp=sharing';
+
+  let dashboard_Array = [ssRestoURL,ssEcURL]; //Put two sheets in Array
 
 
 
@@ -71,7 +64,8 @@ let headers = '';
 
 
 //Changeable variable
-var sheet, fdrow, prRow , fd , copiedFilter, statuscopFil;
+var sheet, fdrow, prRow , prRowRE, fd, urlRE  ;
+  //copiedFilter, statuscopFil;
   
 
 //Stop exe = fail
