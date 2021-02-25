@@ -11,7 +11,7 @@
   //Set a comment on the edited cell to indicate when it was changed
   response_sheetName = ie.source.getActiveSheet().getSheetName();
   var range = ie.range;
-  var ecol = range.getColumn();
+  // var ecol = range.getColumn();
   var erow = range.getRow();
   var pValue = ie.oldValue;
   var nValue = ie.value;
@@ -112,6 +112,8 @@
   detDupSub();
 
   fd = fd2obj();  //fd convert to object
+  // fd[lb] == ec? urlRE = ssEcURL: urlRE=ssRestoURL; //Set URL variable for SSRE
+   fd[lb] == rst? urlRE = ssRestoURL: urlRE=ssEcURL; //Set URL variable for SSRE
 
       // console.log(fd);
 
