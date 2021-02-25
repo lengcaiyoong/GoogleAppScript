@@ -16,24 +16,24 @@ getfdrow = (arrfdrow) => {      //fn to get list of fdrows
 };  
 
 
-// function customManualMenu(){
-//     SpreadsheetApp.getUi().createMenu('Custom Menu')    
-//       .addItem('Manual Trigger', 'manual')
-//       .addToUi();
-// }
-    
-
 function customManualMenu(){
-  SpreadsheetApp.getUi().createMenu('BeatBox')
+    SpreadsheetApp.getUi().createMenu('Custom Menu')    
       .addItem('Manual Trigger', 'manual')
-      .addSeparator()
-      .addSubMenu(SpreadsheetApp.getUi().createMenu('Filter LOB')
-        .addItem('Resto', 'criResto')
-        .addItem('E&C', 'criEC')
-        .addItem('Both', 'rmvFil')
-        )
       .addToUi();
 }
+    
+
+// function customManualMenu(){   //Alternative for custom Menu
+//   SpreadsheetApp.getUi().createMenu('BeatBox')
+//       .addItem('Manual Trigger', 'manual')
+//       .addSeparator()
+//       .addSubMenu(SpreadsheetApp.getUi().createMenu('Filter LOB')
+//         .addItem('Resto', 'criResto')
+//         .addItem('E&C', 'criEC')
+//         .addItem('Both', 'rmvFil')
+//         )
+//       .addToUi();
+// }
 
 
 
@@ -83,6 +83,10 @@ function manual() {
         detDupSub();
         fd = fd2obj();  //fd convert to object
             // console.log(fd);
+
+        //fd[lb] == ec? urlRE = ssEcURL: urlRE=ssRestoURL; //Set URL variable for SSRE
+        fd[lb] == rst? urlRE = ssRestoURL: urlRE=ssEcURL; //Set URL variable for SSRE
+
         dateClean() // split date, clear dup and convert to getTime()
             // console.log(fd);
         detCrash();
