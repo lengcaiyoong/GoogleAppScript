@@ -1,104 +1,123 @@
-// /**
-//  * Create 2 diff Spreadsheet of Monthly Template
-//  * Resto and E&C
-//  */
-
-// function monthTemplate() {
-
-// //Declare Neccesary Variables
-//   let ui = SpreadsheetApp.getUi();
-//   //let fail as stop execute
+function monthlistSSRE() {
 
 
+let input = ui.prompt( 'Please Insert the year' ) ;
+let year = input.getResponseText();
 
-// //Define Start/End Month, year
-//   let startMonth = 0;   //0 stands for Jan
-//   let endMonth = 11;
+ console.log('setUp year');
 
-//   let input = ui.prompt( 'Please Insert the year' ) ;
-//   let year = input.getResponseText();   //Get Year
+ ( !(parseInt(year) < 2100 ) || !(parseInt(year) > 2020) || year.length !== 4 || !(/\d{4}/.test(year)) || input.getSelectedButton() == ui.Button.CLOSE || isNaN(parseInt(year))|| parseInt(year) == '')? (ui.alert('Please Insert Valid Year'),console.error('Insert Invalid Year'),fail):'';
 
-//   ( !(parseInt(year) < 2100 ) || !(parseInt(year) > 2020) || year.length !== 4 || !(/\d{4}/.test(year)) || input.getSelectedButton() == ui.Button.CLOSE || isNaN(parseInt(year))|| parseInt(year) == '')? (ui.alert('Please Insert Valid Year'),console.error('Insert Invalid Year'),fail):'';  //Clear Incorrect Input
+console.log('successfully set up Year')
 
-//   console.log('cont...')
+  for ( x of dashboard_Array){
+
+let ss = SpreadsheetApp.openByUrl(x);
+
+let starting_sheet = 'Sheet1';
+
+console.log(dashboard_Array);
+console.log(x);
+
+//let fail as stop execute
+
+let startMonth = 0;   //0 stands for Jan
+let endMonth = 11;
 
 
-//   //For loop 2 spreadsheets
-//     for( x of dashboard_Array){
+console.log('cont...')
 
-//       ss = x;  //set Spreadsheet
-  
-//         // For Loop Each Month in Specific Spreadsheet
-//       for ( i = startMonth; i<= endMonth; i++ ){   //for loop
-        
-//         var nmMonth = dtb.dmonth( monthlist( i , year )[0] .getTime());  //get name of month
+
+
+ for ( i = startMonth; i<= endMonth; i++ ){   //for loop
+    var nmMonth = dtb.dmonth( monthlist( i , year )[0] .getTime());  //get name of month
     
-//         ss.insertSheet(nmMonth, i+1);    //insert Sheet
+    ss.insertSheet(nmMonth, i+1);    //insert Sheet
 
-//           // Declare Variable
-//         var maxcol = ss.getSheetByName(nmMonth).getMaxColumns();
-//         var maxrow = ss.getSheetByName(nmMonth).getMaxRows();
-//         var tcol = columnheader.length + monthlist( i , year ).length;
-//         var trow = 10;
+    //Declare Variable
+    var maxcol = ss.getSheetByName(nmMonth).getMaxColumns();
+    var maxrow = ss.getSheetByName(nmMonth).getMaxRows();
+    var tcol = columnheader.length + monthlist( i , year ).length;
+    var trow = 10;
 
  
-//          // Adjust Rows and Cols numbers
-//         maxcol !== tcol? 
-//         (maxcol < tcol? (ss.getSheetByName(nmMonth).insertColumns( 1 ,  Math.abs(maxcol - tcol)  ))
-//     :ss.getSheetByName(nmMonth).deleteColumns(1, Math.abs(maxcol - tcol))):''
+    // // Adjust Rows and Cols numbers
+     maxcol !== tcol? 
+     (maxcol < tcol? (ss.getSheetByName(nmMonth).insertColumns( 1 ,  Math.abs(maxcol - tcol)  ))
+    :ss.getSheetByName(nmMonth).deleteColumns(1, Math.abs(maxcol - tcol))):''
 
-//         maxrow !== trow? 
-//           (maxrow < trow? (ss.getSheetByName(nmMonth).insertRows( 1 ,  Math.abs(maxrow - trow)  ))
-//           :ss.getSheetByName(nmMonth).deleteRows(1, Math.abs(maxrow - trow))):''
+    maxrow !== trow? 
+     (maxrow < trow? (ss.getSheetByName(nmMonth).insertRows( 1 ,  Math.abs(maxrow - trow)  ))
+    :ss.getSheetByName(nmMonth).deleteRows(1, Math.abs(maxrow - trow))):''
 
-//         //Insert Header
-//      ss.getSheetByName(nmMonth).getRange('1:1').setValues(    
-//         [columnheader.concat( 
-//           monthlist( i , year ))]
-//      ); 
+     ss.getSheetByName(nmMonth).getRange('1:1').setValues(     //insert Headers
+        [columnheader.concat( 
+          monthlist( i , year ))]
+     ); 
 
-
-//         //Set Conditonal Format
-
-//           ss.getSheetByName(nmMonth).setConditionalFormatRules(
-//         [
-//           SpreadsheetApp.newConditionalFormatRule()
-//         .setRanges([ ss.getSheetByName(nmMonth).getRange(...[2,hIdxS('Full Name',msheader(nmMonth)),trow-1,1])])
-//         .whenFormulaSatisfied(`= countif(${duplicateEmail})>1`)
-//         .setBackground('#00FFFF')
-//         .build()
-//         ]
-//      ); //End conditional Format
+     console.log('finish setting up col and row');
 
 
-//         //Format cells
-//           ss.getSheetByName(nmMonth).getRange('1:1').setFontWeight('bold').setFontColor('#85200c').setHorizontalAlignment('center');
+    //Set Conditonal Format
 
-//           ss.getSheetByName(nmMonth).getRange(...[ 1, 1, 1, msheader(nmMonth).filter( x=> typeof x !== 'object').filter( x => x!=='').length]
-//       ).setFontColor('#000000');
+    ss.getSheetByName(nmMonth).setConditionalFormatRules(   //Set Dup Email
+        [
+          SpreadsheetApp.newConditionalFormatRule()
+        .setRanges(
+          [ ss.getSheetByName(nmMonth).getRange(...[2,hIdxS('Full Name',msheader(nmMonth)),trow-1,1])]
+          )
+        .whenFormulaSatisfied(`= countif(${duplicateEmail})>1`)
+        .setBackground('#00FFFF')
+        .build()
+        ]
+     ); //End conditional Format
 
-//           ss.getSheetByName(nmMonth).getRange(...[2,1,trow-1,msheader(nmMonth).filter( x=> typeof x !== 'object').filter( x => x!=='').length]).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP); 
-
-//           ss.getSheetByName(nmMonth).getRange(...[2,hIdxS('Comment',msheader(nmMonth)),trow-1,1]).setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
-
-
-//         //Create an extra Row after Headings (Format Issue)
-//           ss.getSheetByName(nmMonth).getRange("2:2").setValues(
-//           ss.getSheetByName(nmMonth).getRange("1:1").getValues()
-// );  
-//           ss.getSheetByName(nmMonth).hideRows(2)  //hide 2nd row
-
-//         //End format cell          
-          
-
-//         //Freeze 1st Row
-//           ss.getSheetByName(nmMonth).setFrozenRows(1);
-        
-
-//       }; //end for loop for each month
+console.log('finish setting up conditional Format');
 
 
-//     }; //End loop for dashboard Array
+    //Format cell
+    ss.getSheetByName(nmMonth).getRange('1:1').setFontWeight('bold').setFontColor('#85200c').setHorizontalAlignment('center');
+
+    ss.getSheetByName(nmMonth).getRange(...[ 1, 1, 1, msheader(nmMonth).filter( x=> typeof x !== 'object').filter( x => x!=='').length]
+).setFontColor('#000000');
+
+    ss.getSheetByName(nmMonth).getRange(...[2,1,trow-1,msheader(nmMonth).filter( x=> typeof x !== 'object').filter( x => x!=='').length]).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP); 
+
+    ss.getSheetByName(nmMonth).getRange(...[2,hIdxS('Comment',msheader(nmMonth)),trow-1,1]).setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
+
+
+console.log('finish setting up cell format');
+
+  //Set Conditional Format for LOB
+    setLOBcond(nmMonth,trow);
+
+  console.log('finish setting up LOB color format');
+
+  //Create an extra Row after Headings (Format Issue)
+  ss.getSheetByName(nmMonth).getRange("2:2").setValues(
+ss.getSheetByName(nmMonth).getRange("1:1").getValues()
+);  
+  ss.getSheetByName(nmMonth).hideRows(2)  //hide 2nd row
+
+
+  ss.getSheetByName(nmMonth).setFrozenRows(1);
+        //End format cell
+
+console.log('end hiding row and freeze row');
       
+      }//end for loop within 1 SSRE
 
-// }
+    ss.getSheetByName(starting_sheet).hideSheet();  //hide the first Sheet
+
+  console.log('Finish hiding blank sheets');
+  flush();
+
+} //End Different SSRE loop
+
+console.log('End')
+
+
+}
+
+
+
