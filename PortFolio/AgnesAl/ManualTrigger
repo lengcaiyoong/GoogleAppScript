@@ -16,9 +16,22 @@ getfdrow = (arrfdrow) => {      //fn to get list of fdrows
 };  
 
 
+// function customManualMenu(){
+//     SpreadsheetApp.getUi().createMenu('Custom Menu')    
+//       .addItem('Manual Trigger', 'manual')
+//       .addToUi();
+// }
+    
+
 function customManualMenu(){
-    SpreadsheetApp.getUi().createMenu('Custom Menu')
+  SpreadsheetApp.getUi().createMenu('BeatBox')
       .addItem('Manual Trigger', 'manual')
+      .addSeparator()
+      .addSubMenu(SpreadsheetApp.getUi().createMenu('Filter LOB')
+        .addItem('Resto', 'criResto')
+        .addItem('E&C', 'criEC')
+        .addItem('Both', 'rmvFil')
+        )
       .addToUi();
 }
 
