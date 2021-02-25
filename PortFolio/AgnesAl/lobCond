@@ -1,0 +1,22 @@
+// //Set Condtional on LOB
+
+setLOBcond = (nmMonth, trow)  =>
+ss.getSheetByName(nmMonth).setConditionalFormatRules(   //Set LOB Colors
+  [
+SpreadsheetApp.newConditionalFormatRule()
+  .setRanges(
+    [ss.getSheetByName(nmMonth).getRange(...[1,hIdxS(lb,msheader(nmMonth)),trow,1])])
+  .whenTextEqualTo(ec)
+  .setBackground('#FFFFFF')
+  .setFontColor('#0000ff')    //set text Color
+  .build(),
+
+SpreadsheetApp.newConditionalFormatRule()
+  .setRanges(
+    [ss.getSheetByName(nmMonth).getRange(...[1,hIdxS(lb,msheader(nmMonth)),trow,1])])
+  .whenTextEqualTo(rst)
+  .setBackground('#FFFFFF')
+  .setFontColor('#ff0000')    //set text Color
+  .build()
+  ]
+);
