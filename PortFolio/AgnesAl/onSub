@@ -32,6 +32,8 @@ function sub(event) {
   detDupSub();
 
   fd = fd2obj();  //fd convert to object
+  
+  fd[lb] == rst? urlRE = ssRestoURL: urlRE=ssEcURL; //Set URL variable for SSRE
 
       // console.log(fd);
 
