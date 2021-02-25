@@ -18,8 +18,6 @@ let input = ui.prompt( 'Please Insert the year' ) ;
 let year = input.getResponseText();
 
 
-
-
 ( !(parseInt(year) < 2100 ) || !(parseInt(year) > 2020) || year.length !== 4 || !(/\d{4}/.test(year)) || input.getSelectedButton() == ui.Button.CLOSE || isNaN(parseInt(year))|| parseInt(year) == '')? (ui.alert('Please Insert Valid Year'),console.error('Insert Invalid Year'),fail):'';
 
 console.log('cont...')
@@ -55,10 +53,12 @@ console.log('cont...')
 
     //Set Conditonal Format
 
-    ss.getSheetByName(nmMonth).setConditionalFormatRules(
+    ss.getSheetByName(nmMonth).setConditionalFormatRules(   //Set Dup Email
         [
           SpreadsheetApp.newConditionalFormatRule()
-        .setRanges([ ss.getSheetByName(nmMonth).getRange(...[2,hIdxS('Full Name',msheader(nmMonth)),trow-1,1])])
+        .setRanges(
+          [ ss.getSheetByName(nmMonth).getRange(...[2,hIdxS('Full Name',msheader(nmMonth)),trow-1,1])]
+          )
         .whenFormulaSatisfied(`= countif(${duplicateEmail})>1`)
         .setBackground('#00FFFF')
         .build()
@@ -79,6 +79,10 @@ console.log('cont...')
     ss.getSheetByName(nmMonth).getRange(...[2,hIdxS('Comment',msheader(nmMonth)),trow-1,1]).setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
 
 
+  //Set Conditional Format for LOB
+    setLOBcond(nmMonth,trow);
+
+
   //Create an extra Row after Headings (Format Issue)
   ss.getSheetByName(nmMonth).getRange("2:2").setValues(
 ss.getSheetByName(nmMonth).getRange("1:1").getValues()
@@ -93,4 +97,9 @@ ss.getSheetByName(nmMonth).getRange("1:1").getValues()
       
       }//end for loop
 
+    //ss.getSheetByName(bt).hideSheet();  //hide the first Sheet
+
+
 }
+
+
