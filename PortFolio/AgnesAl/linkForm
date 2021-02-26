@@ -1,5 +1,8 @@
 function linkForm() {
 
+
+let ui = SpreadsheetApp.getUi();
+
 //Link Form to Spreadsheet
   //if googleForm linked a spreadsheet file previously, it will automatically delete it and link the latest spreadsheet
   //get form response sheet
@@ -63,7 +66,21 @@ SpreadsheetApp.getActiveSpreadsheet().getSheets().filter(
 
   SpreadsheetApp.getUi().alert( 'DONE Linked To Spreadsheet' )
 
-  monthTemplate(); //Create Monthly Tab
+
+//Start To Create SSRE Sheets
+  // let fail as stop execute
+//   // Set year
+// let input = ui.prompt( 'Please Insert the year' ) ;
+// let year = input.getResponseText();
+// ( !(parseInt(year) < 2100 ) || !(parseInt(year) > 2020) || year.length !== 4 || !(/\d{4}/.test(year)) || input.getSelectedButton() == ui.Button.CLOSE || isNaN(parseInt(year))|| parseInt(year) == '')? (ui.alert('Please Insert Valid Year'),console.error('Insert Invalid Year'),fail):'';
+
+// console.log('cont...')
+  // monthTemplate(year); //Create Monthly Tab for MainSheet
+//  monthlistSSRE(year); //Create Monthly Tab For SSRE
+
+
+
+monthTemplate(); // Create monthlist
 
   
   installTriggers(); //Install 3 Triggers
