@@ -82,6 +82,7 @@ var sheet, fdrow, prRow , prRowRE, fd, urlRE  ;
 flush = () => {
     SpreadsheetApp.flush();
     SpreadsheetApp.flush();
+    SpreadsheetApp.flush();
 };
 
 
