@@ -46,9 +46,20 @@ function manual() {
 //Redefined Global Variables 
   var input_fdrow = ui.prompt('Kindly Insert the Row notation \n\n eg. 1:1 or 1:5 or 2:7');
 
+    if(input_fdrow.getSelectedButton() == ui.Button.CLOSE){   //return nth if close
+    console.log( )
+    return }
+
 //Validate input of row
   /^([2-9]|[1-9]\d+):[1-9]\d*$/.test(input_fdrow.getResponseText())?fdrow = input_fdrow.getResponseText():(ui.alert('Please Enter Valid Row')  , stop);
   
+
+  /Form Responses/.test(response_sheetName)?'':(  //Cancel run manual if not at form response sheet
+    ui.alert('Invalid sheet selected'), stop
+  );
+
+
+
 //Define variables for Fn of getfdrow
   var tfdrow = input_fdrow.getResponseText();
   var arrfdrow = dtb.cdup(tfdrow.split(':')); //Array of Splited and cleared duplicates from inputPrompt
@@ -119,3 +130,5 @@ function manual() {
   } //end for loop
 
 };            
+
+
