@@ -466,6 +466,7 @@ let flatd1d2 = () => headers.map( (h,i) =>
 
           //clear previous format before add notes
             //if using previous data, no need to clear format
+          flush();  // flush before clearformat
 
     msdata(key).map( (x,i) => x[hIdxArr(id,msheader(key))]  ).findIndex(  x => x == fd[id] ) == -1?
               ss.getSheetByName(key)      //Clear Format
@@ -476,13 +477,14 @@ let flatd1d2 = () => headers.map( (h,i) =>
               plotData[key].length  )
           .clearFormat():'';      
 
-          flush()  // flush after clearformat
+          flush();  // flush after clearformat
 
           //End Clear Format
 
 
 
 //Clear Format for SSRE
+    flush();  // flush before clearformat
 
     msdataRE(key,urlRE).map( (x,i) => x[hIdxArr(id,msheaderRE(key,urlRE))]  ).findIndex(  x => x == fd[id] ) == -1?
               SpreadsheetApp.openByUrl(urlRE).getSheetByName(key)      //Clear Format
@@ -493,7 +495,7 @@ let flatd1d2 = () => headers.map( (h,i) =>
               plotData[key].length  )
           .clearFormat():'';      
 
-          flush()  // flush after clearformat
+          flush();  // flush after clearformat
 
 // End Clear Format for SSRE
 
@@ -512,6 +514,7 @@ let flatd1d2 = () => headers.map( (h,i) =>
 
 //Set Notes for SSRE
     
+    
     SpreadsheetApp.openByUrl(urlRE).getSheetByName(key)      //Set Notes
         .getRange( 
               prRowRE+1, 
@@ -520,13 +523,13 @@ let flatd1d2 = () => headers.map( (h,i) =>
               plotData[key].length  )
           .setNotes(  [plotData[key].map( p => typeof p == 'number'?'':p )]  )
 
-        flush();
         flush(); //flush after setNotes
+        
 
 //End Set Notes for SSRE
 
 
-
+        
 
         //set value, only write basic data on spreadsheet
         ss.getSheetByName(key)
@@ -692,7 +695,7 @@ let flatd1d2 = () => headers.map( (h,i) =>
 // End Plotting
 
 
-//Delete Previous Data
+// //Delete Previous Data
   delPreJS = () => {
       if ( sheet.getRange(fdrow , hIdxS(js,headers) ,1,1 ).getValue( ) !== '' ){
         
@@ -747,7 +750,7 @@ let flatd1d2 = () => headers.map( (h,i) =>
 
         monthIndexRE== -1 ? ( sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue(  'Previous UUID Missing!' ),flush(),console.error("Previous UUID MISSING at SSRE"),fail ):
         (
-        SpreadsheetApp.openByUrl(urlRE).getSheetByName(monthsheet).deleteRow(monthIndex+1), 
+        SpreadsheetApp.openByUrl(urlRE).getSheetByName(monthsheet).deleteRow(monthIndexRE+1), 
         flush(),
         console.log('deleted previous data at SSRE')
         );
