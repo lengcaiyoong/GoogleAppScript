@@ -46,6 +46,8 @@
         if(delalert == ui.Button.YES){   //Choose Yes
             
             console.log('Start Executing \'delete row\'~ Please wait...')
+            fd = fd2obj();  //fd convert to object
+            fd[lb] == rst? urlRE = ssRestoURL: urlRE=ssEcURL; //Set URL variable for SSRE
               delPreJS(); 
               sheet.getRange(fdrow , hIdxS(tg,headers) ,1,1 ).setValue('ROWDELETED'); //return deleted tag at tag col.
               console.log('Done Delete Execution');
