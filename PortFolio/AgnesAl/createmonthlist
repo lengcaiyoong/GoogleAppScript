@@ -51,23 +51,6 @@ console.log('cont...')
      ); 
 
 
-    //Set Conditonal Format
-
-    ss.getSheetByName(nmMonth).setConditionalFormatRules(   //Set Dup Email
-        [
-          SpreadsheetApp.newConditionalFormatRule()
-        .setRanges(
-          [ ss.getSheetByName(nmMonth).getRange(...[2,hIdxS('Full Name',msheader(nmMonth)),trow-1,1])]
-          )
-        .whenFormulaSatisfied(`= countif(${duplicateEmail})>1`)
-        .setBackground('#00FFFF')
-        .build()
-        ]
-     ); //End conditional Format
-
-
-
-
     //Format cell
     ss.getSheetByName(nmMonth).getRange('1:1').setFontWeight('bold').setFontColor('#85200c').setHorizontalAlignment('center');
 
@@ -81,6 +64,20 @@ console.log('cont...')
 
   //Set Conditional Format for LOB
     setLOBcond(nmMonth,trow);
+
+
+  //Set Conditonal Format
+    ss.getSheetByName(nmMonth).setConditionalFormatRules(   //Set Dup Email
+        [
+          SpreadsheetApp.newConditionalFormatRule()
+        .setRanges(
+          [ ss.getSheetByName(nmMonth).getRange(...[2,hIdxS('Full Name',msheader(nmMonth)),trow-1,1])]
+          )
+        .whenFormulaSatisfied(`= countif(${duplicateEmail})>1`)
+        .setBackground('#00FFFF')
+        .build()
+        ]
+     ); //End conditional Format
 
 
   //Create an extra Row after Headings (Format Issue)
@@ -97,7 +94,7 @@ ss.getSheetByName(nmMonth).getRange("1:1").getValues()
       
       }//end for loop
 
-    //ss.getSheetByName(bt).hideSheet();  //hide the first Sheet
+    ss.getSheetByName(bt).hideSheet();  //hide the first Sheet
 
 
 }
